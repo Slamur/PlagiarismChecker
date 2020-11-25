@@ -18,7 +18,7 @@ public class Cluster {
     private final int problemId;
 
     private final List<Clique> cliques;
-    private final Map<Participant, Clique> cliqueByParticipant;
+    private final Map<Participant, Clique> participantToClique;
 
     private final Map<String, String> comments;
 
@@ -29,7 +29,7 @@ public class Cluster {
         this.problemId = problemId;
 
         this.cliques = new ArrayList<>();
-        this.cliqueByParticipant = new LinkedHashMap<>();
+        this.participantToClique = new LinkedHashMap<>();
 
         this.comments = new HashMap<>();
 
@@ -50,19 +50,19 @@ public class Cluster {
     private void addClique(Clique clique) {
         cliques.add(clique);
         clique.getParticipants().forEach(
-                participant -> cliqueByParticipant.put(participant, clique)
+                participant -> participantToClique.put(participant, clique)
         );
     }
 
     public int size() {
-        return cliqueByParticipant.size();
+        return participantToClique.size();
     }
 
     public int getProblemId() {
         return problemId;
     }
 
-    public void setComment(String author, String comment) {
+    synchronized public void setComment(String author, String comment) {
         comments.put(author, comment);
     }
 
@@ -71,12 +71,12 @@ public class Cluster {
     }
 
     public List<Participant> getParticipants() {
-        return new ArrayList<>(cliqueByParticipant.keySet());
+        return new ArrayList<>(participantToClique.keySet());
     }
 
     public void mergeWith(Cluster otherCluster) {
         cliques.addAll(otherCluster.cliques);
-        cliqueByParticipant.putAll(otherCluster.cliqueByParticipant);
+        participantToClique.putAll(otherCluster.participantToClique);
 
         strongConnections.putAll(otherCluster.strongConnections);
         weakConnections.putAll(otherCluster.weakConnections);
@@ -95,8 +95,12 @@ public class Cluster {
         }
     }
 
-    public String commentsToText() {
+    public String commentsToText(boolean printCommentsCount) {
         var builder = new StringBuilder();
+
+        if (printCommentsCount) {
+            builder.append(comments.size()).append("\n");
+        }
 
         for (var commentEntry : comments.entrySet()) {
             builder.append(commentEntry.getKey()).append(": ")
@@ -121,7 +125,7 @@ public class Cluster {
 
         builder.append("\n");
 
-        builder.append(commentsToText()).append("\n");
+        builder.append(commentsToText(false)).append("\n");
 
         builder.append(SEPARATOR).append("\n\n");
 
@@ -135,8 +139,8 @@ public class Cluster {
     }
 
     public void mergeCliques(Participant left, Participant right) {
-        var leftClique = cliqueByParticipant.get(left);
-        var rightClique = cliqueByParticipant.get(right);
+        var leftClique = participantToClique.get(left);
+        var rightClique = participantToClique.get(right);
 
         if (leftClique == rightClique) return;
 
@@ -148,7 +152,7 @@ public class Cluster {
 
         leftClique.mergeWith(rightClique);
         for (Participant participant : rightClique.getParticipants()) {
-            cliqueByParticipant.put(participant, leftClique);
+            participantToClique.put(participant, leftClique);
         }
         cliques.remove(rightClique);
     }
@@ -163,8 +167,8 @@ public class Cluster {
     }
 
     private void divideClique(Participant left, Participant right) {
-        var leftClique = cliqueByParticipant.get(left);
-        var rightClique = cliqueByParticipant.get(right);
+        var leftClique = participantToClique.get(left);
+        var rightClique = participantToClique.get(right);
 
         if (leftClique != rightClique) return;
 
@@ -234,7 +238,7 @@ public class Cluster {
 
         Set<Clique> dividedCliques = new HashSet<>();
         for (var participant : dividedParticipants) {
-            dividedCliques.add(cliqueByParticipant.remove(participant));
+            dividedCliques.add(participantToClique.remove(participant));
 
             var participantWeaks = weakConnections.remove(participant);
             var participantStrongs = strongConnections.remove(participant);

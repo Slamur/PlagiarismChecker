@@ -30,7 +30,7 @@ public class Clique {
     public String participantsToText() {
         var builder = new StringBuilder();
         for (Participant participant : participants) {
-            builder.append(participant).append("\n");
+            builder.append(participant.toText()).append("\n");
         }
 
         return builder.toString();

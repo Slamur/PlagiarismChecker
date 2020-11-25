@@ -5,7 +5,15 @@
 
 <GridPane alignment="center" hgap="10" vgap="10" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1" fx:controller="com.slamur.plagiarism.controller.MainController">
 
-    <TabPane fx:id="tabPane" GridPane.columnIndex="0" GridPane.rowIndex="0">
+    <MenuBar GridPane.columnIndex="0" GridPane.rowIndex="0">
+        <Menu text="File">
+            <MenuItem fx:id="saveRawDataMenuItem" text="Сохранить данные"/>
+            <MenuItem fx:id="loadRawDataMenuItem" text="Загрузить данные и слить с текущими"/>
+            <MenuItem fx:id="saveReportMenuItem" text="Выгрузить полный протокол"/>
+        </Menu>
+    </MenuBar>
+
+    <TabPane fx:id="tabPane" GridPane.columnIndex="0" GridPane.rowIndex="1">
         <Tab fx:id="diffTab">
             <fx:include fx:id="diff" source="diff_scene.fxml"/>
         </Tab>

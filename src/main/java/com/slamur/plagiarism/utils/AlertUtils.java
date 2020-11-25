@@ -24,6 +24,10 @@ public class AlertUtils {
         alert(Alert.AlertType.WARNING, message);
     }
 
+    public static void confirmation(String message) {
+        alert(Alert.AlertType.CONFIRMATION, message);
+    }
+
     public static void alert(Alert.AlertType alertType, String message, Exception e) {
         alert(alertType, message + ": " + e.getMessage());
     }

@@ -8,11 +8,13 @@ import com.slamur.plagiarism.model.parsing.Solution;
 import com.slamur.plagiarism.model.verification.Comparison;
 import com.slamur.plagiarism.model.verification.Status;
 import com.slamur.plagiarism.service.Services;
+import com.slamur.plagiarism.utils.AlertUtils;
 import com.slamur.plagiarism.utils.FxmlUtils;
 import com.slamur.plagiarism.utils.StreamUtils;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
@@ -71,6 +73,11 @@ public class DiffController implements Controller {
     private void initializeComparisonsListView() {
         Services.comparisons().afterInitialization(() -> {
                 Platform.runLater(() -> comparisonInfoLabel.setText("Данные загружены"));
+
+                AlertUtils.alert(
+                        Alert.AlertType.CONFIRMATION, "Данные о сравнениях восстановлены"
+                );
+
                 updateComparisonsListView();
             }
         );
@@ -125,14 +132,14 @@ public class DiffController implements Controller {
 
         participantInfoTextArea.setText(
                 Services.contest().getInfo(participant) + "\n"
-                + participant.toString() + "\n" + "\n"
+                + participant.toText() + "\n" + "\n"
                 + solution.getFullLink()
         );
 
         codeInfoLabel.setText(
                 solution.verdict + "\t"
                 + solution.score + "\t"
-                + solution.dateTime.format(Solution.DATE_TIME_FORMATTER));
+                + solution.getDateTimeString());
 
         codeTextArea.setText(solution.code);
     }

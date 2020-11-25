@@ -4,17 +4,17 @@ import java.util.Arrays;
 
 public enum Status {
 
-    NOT_SEEN("Не просмотрено", false),
-    PLAGIAT("Скопировано", false),
-    UNKNOWN("Спорно", true),
-    IGNORED("Не скопировано", true);
+    NOT_SEEN("Не просмотрено", 0),
+    IGNORED("Не скопировано", 1),
+    UNKNOWN("Спорно", 2),
+    PLAGIAT("Скопировано", 3);
 
     public final String text;
-    public final boolean isEdge;
+    public final int priority;
 
-    Status(String text, boolean isEdge) {
+    Status(String text, int priority) {
         this.text = text;
-        this.isEdge = isEdge;
+        this.priority = priority;
     }
 
     public static Status byText(String text) {

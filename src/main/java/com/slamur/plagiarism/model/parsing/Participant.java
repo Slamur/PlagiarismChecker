@@ -29,13 +29,7 @@ public class Participant {
 
     @Override
     public String toString() {
-        return getFullLink();
-    }
-
-    public void build() {
-        for (Solution solution : solutions) {
-            if (null != solution) solution.build();
-        }
+        return login;
     }
 
     @Override
@@ -58,5 +52,9 @@ public class Participant {
 
     public String getFullLink() {
         return RequestUtils.DOMAIN + link;
+    }
+
+    public String toText() {
+        return getFullLink();
     }
 }

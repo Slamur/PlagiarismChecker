@@ -4,8 +4,12 @@ public class Services {
 
     public static ComparisonService comparisons() {
         if (null == instance.comparisonService) {
-            instance.comparisonService = new ComparisonService();
-            instance.comparisonService.initialize();
+            synchronized (instance) {
+                if (null == instance.comparisonService) {
+                    instance.comparisonService = new ComparisonService();
+                    instance.comparisonService.initialize();
+                }
+            }
         }
 
         return instance.comparisonService;
@@ -13,8 +17,12 @@ public class Services {
 
     public static ContestService contest() {
         if (null == instance.contestService) {
-            instance.contestService = new ContestService();
-            instance.contestService.initialize();
+            synchronized (instance) {
+                if (null == instance.contestService) {
+                    instance.contestService = new ContestService();
+                    instance.contestService.initialize();
+                }
+            }
         }
 
         return instance.contestService;
@@ -22,8 +30,12 @@ public class Services {
 
     public static VerificationService verification() {
         if (null == instance.verificationService) {
-            instance.verificationService = new VerificationService();
-            instance.verificationService.initialize();
+            synchronized (instance) {
+                if (null == instance.verificationService) {
+                    instance.verificationService = new VerificationService();
+                    instance.verificationService.initialize();
+                }
+            }
         }
 
         return instance.verificationService;
@@ -31,9 +43,9 @@ public class Services {
 
     private static final Services instance = new Services();
 
-    private ContestService contestService;
-    private ComparisonService comparisonService;
-    private VerificationService verificationService;
+    private volatile ContestService contestService;
+    private volatile ComparisonService comparisonService;
+    private volatile VerificationService verificationService;
 
     private Services() {
 

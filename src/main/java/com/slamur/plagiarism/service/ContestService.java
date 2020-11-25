@@ -77,6 +77,10 @@ public class ContestService implements Service {
         return contest.getProblemsCount();
     }
 
+    public File getFolder() throws IOException {
+        return contest.createFolder();
+    }
+
     private class ContestRequestProcessor {
 
         private final Map<String, String> cookies;
@@ -94,6 +98,33 @@ public class ContestService implements Service {
         }
     }
 
+    private interface ParticipantPageHolder {
+
+        Document getPage() throws IOException;
+    }
+
+    private class ParticipantPageLazyHolder implements ParticipantPageHolder {
+
+        private final ContestRequestProcessor requestProcessor;
+        private final String participantLink;
+        private Document participantPage;
+
+        public ParticipantPageLazyHolder(ContestRequestProcessor requestProcessor, String participantLink) {
+            this.requestProcessor = requestProcessor;
+            this.participantLink = participantLink;
+            this.participantPage = null;
+        }
+
+        @Override
+        public Document getPage() throws IOException {
+            if (null == participantPage) {
+                String profilePlain = requestProcessor.get(participantLink);
+                this.participantPage = Jsoup.parse(profilePlain);
+            }
+
+            return participantPage;
+        }
+    }
 
     public List<Participant> loadParticipants() throws IOException {
         ContestRequestProcessor requestProcessor = new ContestRequestProcessor(
@@ -119,9 +150,6 @@ public class ContestService implements Service {
 
             String participantLink = participantLinkElement.attr("href");
 
-            String profilePlain = requestProcessor.get(participantLink);
-            Document participantPage = Jsoup.parse(profilePlain);
-
             Participant participant = Participant.create(participantLink, contest);
 
             File participantFolder = new File(participantsFolder, participant.login);
@@ -134,34 +162,37 @@ public class ContestService implements Service {
                 }
             }
 
-            ParticipantInfo info = getInfo(participantFolder, participantPage);
+            var pageHolder = new ParticipantPageLazyHolder(
+                    requestProcessor, participantLink
+            );
+
+            ParticipantInfo info = getInfo(participantFolder, pageHolder);
             infoByParticipant.put(participant, info);
 
-            fillSolutions(participant, participantFolder, participantPage, requestProcessor);
-
-            participant.build();
+            fillSolutions(participant, participantFolder, pageHolder, requestProcessor);
             participants.add(participant);
         }
 
         return participants;
     }
 
-    private void fillSolutions(Participant participant, File participantFolder, Document participantPage,
+    private void fillSolutions(Participant participant, File participantFolder,
+                               ParticipantPageHolder pageHolder,
                                ContestRequestProcessor requestProcessor) throws IOException {
         File solutionsFile = new File(participantFolder, "solutions.txt");
         if (!solutionsFile.exists()) {
-            loadSolutionsFromDomain(participant, participantPage, requestProcessor);
-
+            loadSolutionsFromDomain(participant, pageHolder.getPage(), requestProcessor);
             saveSolutionsToFile(solutionsFile, participant);
         } else {
             loadSolutionsFromFile(solutionsFile, participant);
         }
     }
 
-    private ParticipantInfo getInfo(File participantFolder, Document participantPage) throws IOException {
+    private ParticipantInfo getInfo(File participantFolder, ParticipantPageHolder pageHolder)
+            throws IOException {
         File infoFile = new File(participantFolder, "info.txt");
         if (!infoFile.exists()) {
-            ParticipantInfo info = parseInfoFromPage(participantPage);
+            ParticipantInfo info = parseInfoFromPage(pageHolder.getPage());
             saveInfoToFile(infoFile, info);
             return info;
         } else {

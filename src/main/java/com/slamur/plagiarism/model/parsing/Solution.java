@@ -14,6 +14,14 @@ public class Solution {
     public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(DATE_TIME_PATTERN);
 
     public static double calculateSimilarity(Solution leftSolution, Solution rightSolution, double filter) {
+        if (null == leftSolution.rows) {
+            leftSolution.build();
+        }
+
+        if (null == rightSolution.rows) {
+            rightSolution.build();
+        }
+
         List<SolutionRow> leftRows = leftSolution.rows;
         List<SolutionRow> rightRows = rightSolution.rows;
         
@@ -57,7 +65,7 @@ public class Solution {
 
     @Override
     public String toString() {
-        return getFullLink() + "\t" + dateTime;
+        return getFullLink() + "\t" + getDateTimeString();
     }
 
     public String toText() {
@@ -65,12 +73,16 @@ public class Solution {
         return link + "\n" +
                 verdict + "\n" +
                 score + "\n" +
-                dateTime.format(DATE_TIME_FORMATTER) + "\n" +
+                getDateTimeString() + "\n" +
                 codeSize + "\n" +
                 code + "\n";
     }
 
     public String getFullLink() {
         return RequestUtils.DOMAIN + link;
+    }
+
+    public String getDateTimeString() {
+        return dateTime.format(DATE_TIME_FORMATTER);
     }
 }
