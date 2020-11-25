@@ -8,12 +8,14 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Comparator;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.function.Predicate;
+import java.util.stream.IntStream;
 
 import com.slamur.plagiarism.model.parsing.Contest;
 import com.slamur.plagiarism.model.parsing.Participant;
@@ -62,6 +64,8 @@ public class ComparisonService implements Service {
 
             loadComparisons(participants);
             generateComparisons(participants);
+
+            orderComparisons();
 
             if (null != afterInitialization) {
                 afterInitialization.run();
@@ -138,6 +142,24 @@ public class ComparisonService implements Service {
         }
     }
 
+    private void orderComparisons() {
+        List<Comparison>[] problemToComparisons = IntStream.range(0, Services.contest().getProblemsCount())
+                .mapToObj(problemId -> new ArrayList<>())
+                .toArray(List[]::new);
+
+        comparisons.forEach(
+                comparison -> problemToComparisons[comparison.problemId].add(comparison)
+        );
+
+        comparisons.clear();
+
+        Arrays.stream(problemToComparisons)
+                .forEach(problemComparisons -> {
+                    Collections.shuffle(problemComparisons);
+                    comparisons.addAll(problemComparisons);
+                });
+    }
+
     public Comparison compare(Participant left, Participant right, int problemIndex) {
         var leftSolution = left.solutions[problemIndex];
         var rightSolution = right.solutions[problemIndex];
@@ -150,6 +172,10 @@ public class ComparisonService implements Service {
             if (Verdict.WA == leftSolution.verdict || Verdict.WA == rightSolution.verdict) {
                 return null;
             }
+        }
+
+        if (leftSolution.score != rightSolution.score) {
+            return null;
         }
 
         var comparison = new Comparison(left, right, problemIndex);
@@ -166,8 +192,7 @@ public class ComparisonService implements Service {
     }
 
     public ObservableList<Comparison> getComparisons(Predicate<Comparison> predicate) {
-        return comparisons.filtered(predicate)
-                .sorted(Comparator.comparingDouble(similarityByComparison::get));
+        return comparisons.filtered(predicate);
     }
 
     public Predicate<Comparison> moreThan(double minSimilarity) {
