@@ -1,2 +1,6 @@
 # Project exclude paths
 /target/
+/contests/
+app.properties
+*.iml
+/.idea/
