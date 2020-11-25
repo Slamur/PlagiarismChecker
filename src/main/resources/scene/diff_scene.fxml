@@ -1,6 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
@@ -8,9 +7,9 @@
 
     <ListView fx:id="comparisonsListView" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.rowSpan="5" />
 
-    <TextArea fx:id="leftParticipantInfoTextArea" GridPane.columnIndex="1" GridPane.rowIndex="0" />
+    <TextArea fx:id="leftParticipantInfoTextArea" prefHeight="100.0" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 
-    <TextArea fx:id="rightParticipantInfoTextArea" GridPane.columnIndex="3" GridPane.rowIndex="0" />
+    <TextArea fx:id="rightParticipantInfoTextArea" prefHeight="100.0" GridPane.columnIndex="3" GridPane.rowIndex="0" />
 
     <Label fx:id="leftCodeInfoLabel" GridPane.columnIndex="1" GridPane.rowIndex="1" />
 
@@ -26,28 +25,20 @@
 
     <Button fx:id="goToClusterButton" text="Перейти к кластеру" GridPane.columnIndex="2" GridPane.rowIndex="3" />
 
+    <HBox alignment="CENTER_LEFT" spacing="50.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
+        <CheckBox fx:id="blindModeCheckBox" text="Слепой режим" />
+
+        <Button fx:id="prevComparisonButton" text="Предыдущее сравнение" />
+
+        <Button fx:id="nextComparisonButton" text="Следующее сравнение" />
+    </HBox>
+
     <HBox alignment="CENTER_RIGHT" spacing="50.0" GridPane.columnIndex="3" GridPane.rowIndex="4">
         <Button fx:id="ignoreButton" text="Не списано" />
 
         <Button fx:id="unknownButton" text="Непонятно" />
 
         <Button fx:id="plagiatButton" text="Точно списано" />
-      <GridPane.margin>
-         <Insets />
-      </GridPane.margin>
     </HBox>
-   <columnConstraints>
-      <ColumnConstraints />
-      <ColumnConstraints />
-      <ColumnConstraints />
-      <ColumnConstraints />
-   </columnConstraints>
-   <rowConstraints>
-      <RowConstraints />
-      <RowConstraints />
-      <RowConstraints />
-      <RowConstraints />
-      <RowConstraints />
-   </rowConstraints>
 
 </GridPane>

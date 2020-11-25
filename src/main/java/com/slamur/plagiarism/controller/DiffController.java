@@ -1,10 +1,10 @@
 package com.slamur.plagiarism.controller;
 
 import java.net.URL;
+import java.util.List;
 import java.util.ResourceBundle;
 
 import com.slamur.plagiarism.model.parsing.Participant;
-import com.slamur.plagiarism.model.parsing.Solution;
 import com.slamur.plagiarism.model.verification.Comparison;
 import com.slamur.plagiarism.model.verification.Status;
 import com.slamur.plagiarism.service.Services;
@@ -16,6 +16,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
@@ -49,6 +50,13 @@ public class DiffController implements Controller {
 
     @FXML public Button goToClusterButton;
 
+    @FXML public CheckBox blindModeCheckBox;
+
+    @FXML public Button prevComparisonButton;
+
+    @FXML public Button nextComparisonButton;
+
+    private int comparisonIndex;
     private Comparison comparison;
 
     private MainController mainController;
@@ -61,8 +69,45 @@ public class DiffController implements Controller {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         initializeComparisonInfoPart();
         initializeDiffPart();
+        initializeBlindMode();
+        initializeMovePart();
 
         this.comparison = null;
+        this.comparisonIndex = -1;
+    }
+
+    private void initializeMovePart() {
+        prevComparisonButton.setOnAction(event -> move(-1));
+        nextComparisonButton.setOnAction(event -> moveNext());
+    }
+
+    private void moveNext() {
+        move(1);
+    }
+
+    private void move(int shift) {
+        List<Comparison> comparisons = comparisonsListView.getItems();
+
+        if (comparisonIndex == -1) {
+            comparisonIndex = 0;
+        }
+
+        comparisonIndex = (comparisonIndex + comparisons.size() + shift) % comparisons.size();
+        selectComparison(comparisonIndex);
+    }
+
+    private void initializeBlindMode() {
+        blindModeCheckBox.selectedProperty().addListener(
+                (observableValue, wasBlind, nowBlind) -> updateViewForMode(nowBlind)
+        );
+
+        blindModeCheckBox.selectedProperty().setValue(true);
+    }
+
+    private void updateViewForMode(boolean isBlindMode) {
+        comparisonsListView.setVisible(!isBlindMode);
+        leftParticipantInfoTextArea.setVisible(!isBlindMode);
+        rightParticipantInfoTextArea.setVisible(!isBlindMode);
     }
 
     private void initializeComparisonInfoPart() {
@@ -79,14 +124,17 @@ public class DiffController implements Controller {
                 );
 
                 updateComparisonsListView();
+
+                selectComparison(0);
             }
         );
 
         var selectionModel = comparisonsListView.getSelectionModel();
 
         selectionModel.setSelectionMode(SelectionMode.SINGLE);
-        selectionModel.selectedItemProperty().addListener(
-                (observableValue, oldComparison, newComparison) -> selectComparison(newComparison)
+        selectionModel.selectedIndexProperty().addListener(
+                (observableValue, oldComparisonIndex, newComparisonIndex)
+                        -> selectComparison(newComparisonIndex.intValue())
         );
     }
 
@@ -105,9 +153,10 @@ public class DiffController implements Controller {
         comparisonsListView.getSelectionModel().select(comparison);
     }
 
-    private void selectComparison(Comparison comparison) {
-        if (null == comparison) return;
-        this.comparison = comparison;
+    private void selectComparison(int comparisonIndex) {
+        if (-1 == comparisonIndex) return;
+        this.comparisonIndex = comparisonIndex;
+        this.comparison = comparisonsListView.getItems().get(comparisonIndex);
 
         showSelectedComparison();
     }
@@ -123,11 +172,11 @@ public class DiffController implements Controller {
         showParticipantSolution(comparison.right, comparison.problemId, rightCodeInfoLabel, rightParticipantInfoTextArea, rightCodeTextArea);
     }
 
-    private static void showParticipantSolution(Participant participant,
-                                                int problemId,
-                                                Label codeInfoLabel,
-                                                TextArea participantInfoTextArea,
-                                                TextArea codeTextArea) {
+    private void showParticipantSolution(Participant participant,
+                                         int problemId,
+                                         Label codeInfoLabel,
+                                         TextArea participantInfoTextArea,
+                                         TextArea codeTextArea) {
         var solution = participant.solutions[problemId];
 
         participantInfoTextArea.setText(
@@ -136,10 +185,14 @@ public class DiffController implements Controller {
                 + solution.getFullLink()
         );
 
-        codeInfoLabel.setText(
-                solution.verdict + "\t"
-                + solution.score + "\t"
-                + solution.getDateTimeString());
+        String codeInfoText = solution.verdict + "\t"
+                + solution.score;
+
+        if (!blindModeCheckBox.selectedProperty().getValue()) {
+            codeInfoText += "\t" + solution.getDateTimeString();
+        }
+
+        codeInfoLabel.setText(codeInfoText);
 
         codeTextArea.setText(solution.code);
     }
@@ -157,10 +210,15 @@ public class DiffController implements Controller {
     private void initializeParticipantPart() {
         leftParticipantInfoTextArea.setEditable(false);
         rightParticipantInfoTextArea.setEditable(false);
+
+        double participantAreaHeight = FxmlUtils.getScreenSize().height / 10.0;
+
+        leftParticipantInfoTextArea.setPrefHeight(participantAreaHeight);
+        rightParticipantInfoTextArea.setPrefHeight(participantAreaHeight);
     }
 
     private void initializeCodePart() {
-        double codeAreaHeight = FxmlUtils.getScreenSize().height / 2.0;
+        double codeAreaHeight = FxmlUtils.getScreenSize().height * 2.0 / 3.0;
 
         leftCodeTextArea.setPrefHeight(codeAreaHeight);
         rightCodeTextArea.setPrefHeight(codeAreaHeight);
@@ -195,18 +253,22 @@ public class DiffController implements Controller {
         Services.verification().setStatus(comparison, status);
         comparisonStatusLabel.setText(status.text);
         updateComparisonsListView();
+        selectComparison(comparisonIndex);
     }
 
     public void plagiatAction(ActionEvent event) {
         updateStatus(Status.PLAGIAT);
+        moveNext();
     }
 
     public void unknownAction(ActionEvent event) {
         updateStatus(Status.UNKNOWN);
+        moveNext();
     }
 
     public void ignoreAction(ActionEvent event) {
         updateStatus(Status.IGNORED);
+        move(0);
     }
 
     public void goToClusterAction(ActionEvent event) {
