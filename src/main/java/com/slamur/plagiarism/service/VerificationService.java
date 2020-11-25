@@ -311,7 +311,10 @@ public class VerificationService implements Service {
                         throw new IOException("Кластер содержит некорректный идентификатор задачи: " + clusterInfoLine);
                     }
 
-                    Cluster cluster = createCluster(participant, problemId);
+                    Cluster cluster = getCluster(participant, problemId);
+                    if (null == cluster) {
+                        cluster = createCluster(participant, problemId);
+                    }
 
                     int commentsCount = Integer.parseInt(in.readLine());
                     for (int clusterCommentIndex = 0; clusterCommentIndex < commentsCount; ++clusterCommentIndex) {
