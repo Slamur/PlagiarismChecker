@@ -2,6 +2,7 @@ package com.slamur.plagiarism.service;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileReader;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -17,7 +18,7 @@ public class PropertiesService {
 
         try {
             appProperties.load(
-                    IOUtils.createReader(new FileInputStream(new File("app.properties")))
+                   new FileReader("app.properties")
             );
         } catch (IOException e) {
             AlertUtils.warning("Проблема при загрузке настроек", e);
