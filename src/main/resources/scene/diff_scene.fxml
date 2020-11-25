@@ -1,9 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import javafx.geometry.*?>
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<GridPane alignment="center" hgap="10" vgap="10" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1" fx:controller="com.slamur.plagiarism.controller.DiffController">
+<GridPane alignment="center" hgap="10" vgap="10" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.slamur.plagiarism.controller.DiffController">
 
     <ListView fx:id="comparisonsListView" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.rowSpan="5" />
 
@@ -25,10 +26,28 @@
 
     <Button fx:id="goToClusterButton" text="Перейти к кластеру" GridPane.columnIndex="2" GridPane.rowIndex="3" />
 
-    <Button fx:id="plagiatButton" text="Точно списано" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+    <HBox alignment="CENTER_RIGHT" spacing="50.0" GridPane.columnIndex="3" GridPane.rowIndex="4">
+        <Button fx:id="ignoreButton" text="Не списано" />
 
-    <Button fx:id="unknownButton" text="Непонятно" GridPane.columnIndex="2" GridPane.rowIndex="4" />
+        <Button fx:id="unknownButton" text="Непонятно" />
 
-    <Button fx:id="ignoreButton" text="Не списано" GridPane.columnIndex="3" GridPane.rowIndex="4" />
+        <Button fx:id="plagiatButton" text="Точно списано" />
+      <GridPane.margin>
+         <Insets />
+      </GridPane.margin>
+    </HBox>
+   <columnConstraints>
+      <ColumnConstraints />
+      <ColumnConstraints />
+      <ColumnConstraints />
+      <ColumnConstraints />
+   </columnConstraints>
+   <rowConstraints>
+      <RowConstraints />
+      <RowConstraints />
+      <RowConstraints />
+      <RowConstraints />
+      <RowConstraints />
+   </rowConstraints>
 
 </GridPane>
