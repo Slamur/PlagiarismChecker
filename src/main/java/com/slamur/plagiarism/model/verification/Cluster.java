@@ -130,8 +130,8 @@ public class Cluster {
 
     @Override
     public String toString() {
-        Participant firstParticipant = getParticipants().stream().findFirst().orElseThrow();
-        return firstParticipant.id + " " + ModelUtils.getProblemName(problemId);
+        int firstParticipantId = getParticipants().stream().findFirst().map(p -> p.id).orElse(-1);
+        return firstParticipantId + " " + ModelUtils.getProblemName(problemId);
     }
 
     public void mergeCliques(Participant left, Participant right) {

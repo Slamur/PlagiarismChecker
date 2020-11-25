@@ -47,6 +47,7 @@ public class VerificationService implements Service {
 
     public Optional<Comparison> getComparison(Cluster cluster, Participant left, Participant right) {
         if (null == left || null == right) return Optional.empty();
+        if (left.equals(right)) return Optional.empty();
 
         return Optional.of(
                 new Comparison(left, right, cluster.getProblemId())
