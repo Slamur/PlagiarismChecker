@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<GridPane alignment="center" hgap="10" vgap="10" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1" fx:controller="com.slamur.plagiarism.controller.MainController">
+
+    <TabPane fx:id="tabPane" GridPane.columnIndex="0" GridPane.rowIndex="0">
+        <Tab fx:id="diffTab">
+            <fx:include fx:id="diff" source="diff_scene.fxml"/>
+        </Tab>
+
+        <Tab fx:id="clusterTab">
+            <fx:include fx:id="cluster" source="cluster_scene.fxml"/>
+        </Tab>
+    </TabPane>
+
+</GridPane>
