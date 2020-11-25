@@ -77,7 +77,7 @@ public class MainController implements Controller {
     private void saveRawDataAction(ActionEvent event) {
         try {
             Services.verification().saveDataToFile();
-            AlertUtils.confirmation(
+            AlertUtils.information(
                     "Данные сохранены"
             );
         } catch (Exception e) {
@@ -94,7 +94,7 @@ public class MainController implements Controller {
         if (null != patchFile) {
             try {
                 Services.verification().loadPatchFrom(patchFile);
-                AlertUtils.confirmation(
+                AlertUtils.information(
                         "Патч данных загружен"
                 );
             } catch (Exception e) {
@@ -108,7 +108,7 @@ public class MainController implements Controller {
     private void saveReportAction(ActionEvent event) {
         try {
             Services.verification().saveReportToFile();
-            AlertUtils.confirmation(
+            AlertUtils.information(
                     "Проткоол сохранён"
             );
         } catch (Exception e) {
