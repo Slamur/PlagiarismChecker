@@ -117,15 +117,15 @@ public class DiffController implements Controller {
 
     private void initializeComparisonsListView() {
         Services.comparisons().afterInitialization(() -> {
-                Platform.runLater(() -> comparisonInfoLabel.setText("Данные загружены"));
+                Platform.runLater(() -> {
+                    comparisonInfoLabel.setText("Данные загружены");
 
-                AlertUtils.alert(
-                        Alert.AlertType.CONFIRMATION, "Данные о сравнениях восстановлены"
-                );
+                    AlertUtils.information("Данные о сравнениях восстановлены");
 
-                updateComparisonsListView();
+                    updateComparisonsListView();
 
-                selectComparison(0);
+                    selectComparison(0);
+                });
             }
         );
 
