@@ -333,6 +333,8 @@ public class VerificationService implements Service {
 
                         cluster.setComment(author, comment);
                     }
+
+                    in.readLine();
                 }
             } catch (IOException e) {
                 throw new IOException("Ошибка при чтении комментариев из файла. Данные о вердиктах уже применены", e);
