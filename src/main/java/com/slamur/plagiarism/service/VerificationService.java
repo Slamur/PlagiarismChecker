@@ -19,9 +19,8 @@ import com.slamur.plagiarism.utils.AlertUtils;
 import com.slamur.plagiarism.utils.IOUtils;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
-import javafx.scene.control.Alert;
 
-public class VerificationService implements Service {
+public class VerificationService extends Service.ServiceImpl {
 
     private static final String verificationFileName = "verification";
 
@@ -41,7 +40,7 @@ public class VerificationService implements Service {
     }
 
     @Override
-    public void initialize() {
+    protected void initializeOnly() {
         var properties = PropertiesService.appProperties;
 
         this.jury = properties.getProperty("jury");
@@ -49,17 +48,14 @@ public class VerificationService implements Service {
             jury = "Jury " + this.hashCode();
         }
 
-        new Thread(() -> {
-            try {
-                restoreDataFromFile();
-
+        try {
+            restoreDataFromFile();
 //                AlertUtils.information("Данные о кластерах восстановлены");
-            } catch (IOException e) {
-                AlertUtils.warning(
-                        "Ошибка при восстановлении данных", e
-                );
-            }
-        }).start();
+        } catch (IOException e) {
+            AlertUtils.warning(
+                    "Ошибка при восстановлении данных", e
+            );
+        }
     }
 
     public void setJuryComment(Cluster cluster, String comment) {

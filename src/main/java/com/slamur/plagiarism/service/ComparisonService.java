@@ -26,7 +26,7 @@ import com.slamur.plagiarism.utils.AlertUtils;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-public class ComparisonService implements Service {
+public class ComparisonService extends Service.ServiceImpl {
 
     private static final boolean waScan = false;
     private static final double solutionSimilarityFilter = 0.9;
@@ -37,7 +37,6 @@ public class ComparisonService implements Service {
     private final Map<Comparison, Double> similarityByComparison;
 
     private File comparisonsFile;
-    private volatile Runnable afterInitialization;
 
     ComparisonService() {
         this.comparisons = FXCollections.observableArrayList();
@@ -45,32 +44,26 @@ public class ComparisonService implements Service {
     }
 
     @Override
-    public void initialize() {
-        new Thread(() -> {
-            var participants = Services.contest().getParticipants();
+    protected void initializeOnly() {
+        var participants = Services.contest().getParticipants();
 
-            Contest contest = Services.contest().getContest();
+        Contest contest = Services.contest().getContest();
 
-            try {
-                this.comparisonsFile = new File(contest.createFolder(), comparisonsFileName + ".txt");
-                if (!comparisonsFile.exists()) {
-                    if (!comparisonsFile.createNewFile()) {
-                        throw new IOException("Неудачное создание файла");
-                    }
+        try {
+            this.comparisonsFile = new File(contest.createFolder(), comparisonsFileName + ".txt");
+            if (!comparisonsFile.exists()) {
+                if (!comparisonsFile.createNewFile()) {
+                    throw new IOException("Неудачное создание файла");
                 }
-            } catch (IOException e) {
-                AlertUtils.warning("Проблема с кешированием сравнений", e);
             }
+        } catch (IOException e) {
+            AlertUtils.warning("Проблема с кешированием сравнений", e);
+        }
 
-            loadComparisons(participants);
-            generateComparisons(participants);
+        loadComparisons(participants);
+        generateComparisons(participants);
 
-            orderComparisons();
-
-            if (null != afterInitialization) {
-                afterInitialization.run();
-            }
-        }).start();
+        orderComparisons();
     }
 
     private void loadComparisons(List<Participant> participants) {
@@ -198,10 +191,6 @@ public class ComparisonService implements Service {
     public Predicate<Comparison> moreThan(double minSimilarity) {
         return (comparison) ->
                 similarityByComparison.getOrDefault(comparison, 0.0) > minSimilarity;
-    }
-
-    public void afterInitialization(Runnable afterInitialization) {
-        this.afterInitialization = afterInitialization;
     }
 }
 

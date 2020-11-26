@@ -35,7 +35,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.parser.Parser;
 
-public class ContestService implements Service {
+public class ContestService extends Service.ServiceImpl {
 
     public static final Contest OKRUG_2020 = new Contest(
             Contest.CITY, 579,
@@ -55,7 +55,8 @@ public class ContestService implements Service {
         this.infoByParticipant = new HashMap<>();
     }
 
-    public void initialize() {
+    @Override
+    protected void initializeOnly() {
         try {
             loadParticipants();
         } catch (IOException e) {
@@ -128,7 +129,7 @@ public class ContestService implements Service {
         }
     }
 
-    public List<Participant> loadParticipants() throws IOException {
+    public void loadParticipants() throws IOException {
         File contestFolder = contest.createFolder();
         File participantsFolder = new File(contestFolder, "participants");
         if (!participantsFolder.exists()) {
@@ -171,7 +172,6 @@ public class ContestService implements Service {
             participants.add(participant);
         }
 
-        return participants;
     }
 
     private List<String> getDirectoryLinks(File participantsFolder) {
@@ -323,11 +323,11 @@ public class ContestService implements Service {
             score = Integer.parseInt(scoreText);
         }
 
-        Solution solution = participant.solutions[problemIndex];
+        Solution oldSolution = participant.solutions[problemIndex];
 
-        boolean needUpdate = (null == solution)
-                || (Verdict.AC == verdict && Verdict.AC != solution.verdict)
-                || solution.verdict == verdict && solution.dateTime.compareTo(dateTime) < 0;
+        boolean needUpdate = (null == oldSolution)
+                || oldSolution.score < score
+                || oldSolution.score == score && oldSolution.dateTime.compareTo(dateTime) > 0;
 
         if (needUpdate) {
             Element codeElement = submitPage.getElementsByTag("code").first();

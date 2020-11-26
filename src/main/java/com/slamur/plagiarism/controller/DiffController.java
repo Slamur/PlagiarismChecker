@@ -8,13 +8,11 @@ import com.slamur.plagiarism.model.parsing.Participant;
 import com.slamur.plagiarism.model.verification.Comparison;
 import com.slamur.plagiarism.model.verification.Status;
 import com.slamur.plagiarism.service.Services;
-import com.slamur.plagiarism.utils.AlertUtils;
 import com.slamur.plagiarism.utils.FxmlUtils;
 import com.slamur.plagiarism.utils.StreamUtils;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -117,17 +115,15 @@ public class DiffController implements Controller {
     }
 
     private void initializeComparisonsListView() {
-        Services.comparisons().afterInitialization(() -> {
-                Platform.runLater(() -> {
-                    comparisonInfoLabel.setText("Данные загружены");
+        Services.comparisons().afterInitialization(() -> Platform.runLater(() -> {
+                comparisonInfoLabel.setText("Данные загружены");
 
-//                    AlertUtils.information("Данные о сравнениях восстановлены");
+    //                    AlertUtils.information("Данные о сравнениях восстановлены");
 
-                    updateComparisonsListView();
+                updateComparisonsListView();
 
-                    selectComparison(0);
-                });
-            }
+                selectComparison(0);
+            })
         );
 
         var selectionModel = comparisonsListView.getSelectionModel();

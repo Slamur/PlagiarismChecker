@@ -6,7 +6,7 @@ import com.slamur.plagiarism.utils.RequestUtils;
 
 public class Participant {
 
-    public static final String PROFILE_PREFIX = "ru/viewprofile/";
+    public static final String PROFILE_PREFIX = "/ru/viewprofile/";
 
     public static String getLinkByLogin(String login) {
         return PROFILE_PREFIX + login + "/";
