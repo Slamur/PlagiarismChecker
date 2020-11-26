@@ -6,7 +6,13 @@ import com.slamur.plagiarism.utils.RequestUtils;
 
 public class Participant {
 
-    public static Participant create(String link, Contest contest) {
+    public static final String PROFILE_PREFIX = "ru/viewprofile/";
+
+    public static String getLinkByLogin(String login) {
+        return PROFILE_PREFIX + login + "/";
+    }
+
+    public static Participant createFromLink(String link, Contest contest) {
         link = link.substring(0, link.length() - 1);
         if (link.endsWith("%20")) link = link.substring(0, link.indexOf("%20"));
 

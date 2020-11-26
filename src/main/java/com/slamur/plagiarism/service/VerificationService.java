@@ -53,7 +53,7 @@ public class VerificationService implements Service {
             try {
                 restoreDataFromFile();
 
-                AlertUtils.information("Данные о кластерах восстановлены");
+//                AlertUtils.information("Данные о кластерах восстановлены");
             } catch (IOException e) {
                 AlertUtils.warning(
                         "Ошибка при восстановлении данных", e

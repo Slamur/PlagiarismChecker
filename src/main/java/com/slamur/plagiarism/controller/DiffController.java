@@ -87,6 +87,7 @@ public class DiffController implements Controller {
 
     private void move(int shift) {
         List<Comparison> comparisons = comparisonsListView.getItems();
+        if (comparisons.isEmpty()) return;
 
         if (comparisonIndex == -1) {
             comparisonIndex = 0;
@@ -120,7 +121,7 @@ public class DiffController implements Controller {
                 Platform.runLater(() -> {
                     comparisonInfoLabel.setText("Данные загружены");
 
-                    AlertUtils.information("Данные о сравнениях восстановлены");
+//                    AlertUtils.information("Данные о сравнениях восстановлены");
 
                     updateComparisonsListView();
 
@@ -155,6 +156,8 @@ public class DiffController implements Controller {
 
     private void selectComparison(int comparisonIndex) {
         if (-1 == comparisonIndex) return;
+        if (comparisonsListView.getItems().isEmpty()) return;
+
         this.comparisonIndex = comparisonIndex;
         this.comparison = comparisonsListView.getItems().get(comparisonIndex);
 

@@ -12,10 +12,14 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.slamur.plagiarism.model.parsing.Contest;
 import com.slamur.plagiarism.model.parsing.Participant;
@@ -53,9 +57,7 @@ public class ContestService implements Service {
 
     public void initialize() {
         try {
-            participants.addAll(
-                    loadParticipants()
-            );
+            loadParticipants();
         } catch (IOException e) {
             AlertUtils.error("Не удалось загрузить участников с их решениями", e);
         }
@@ -127,17 +129,6 @@ public class ContestService implements Service {
     }
 
     public List<Participant> loadParticipants() throws IOException {
-        ContestRequestProcessor requestProcessor = new ContestRequestProcessor(
-                CredentialsService.getCredentialCookies()
-        );
-
-        String monitorPlain = requestProcessor.monitor();
-        Document monitor = Jsoup.parse(monitorPlain);
-
-        List<Element> participantLinks = monitor.getElementsByAttributeValueContaining("href", "viewprofile/" + contest.getType());
-
-        List<Participant> participants = new ArrayList<>();
-
         File contestFolder = contest.createFolder();
         File participantsFolder = new File(contestFolder, "participants");
         if (!participantsFolder.exists()) {
@@ -146,11 +137,18 @@ public class ContestService implements Service {
             }
         }
 
-        for (Element participantLinkElement : participantLinks) {
+        Set<String> totalParticipantLinks = new HashSet<>(getDirectoryLinks(participantsFolder));
 
-            String participantLink = participantLinkElement.attr("href");
+        ContestRequestProcessor requestProcessor = new ContestRequestProcessor(
+                CredentialsService.getCredentialCookies()
+        );
 
-            Participant participant = Participant.create(participantLink, contest);
+        totalParticipantLinks.addAll(
+                getMonitorLinks(requestProcessor)
+        );
+
+        for (String participantLink : totalParticipantLinks) {
+            Participant participant = Participant.createFromLink(participantLink, contest);
 
             File participantFolder = new File(participantsFolder, participant.login);
             if (!participantFolder.exists()) {
@@ -174,6 +172,27 @@ public class ContestService implements Service {
         }
 
         return participants;
+    }
+
+    private List<String> getDirectoryLinks(File participantsFolder) {
+        return Arrays.stream(participantsFolder.listFiles())
+                .filter(File::isDirectory)
+                .map(File::getName)
+                .map(Participant::getLinkByLogin)
+                .collect(Collectors.toList());
+    }
+
+    private List<String> getMonitorLinks(
+            ContestRequestProcessor requestProcessor
+    ) throws IOException {
+        String monitorPlain = requestProcessor.monitor();
+        Document monitor = Jsoup.parse(monitorPlain);
+
+        List<Element> participantLinks = monitor.getElementsByAttributeValueContaining("href", "viewprofile/" + contest.getType());
+
+        return participantLinks.stream()
+                .map(participantLinkElement -> participantLinkElement.attr("href"))
+                .collect(Collectors.toList());
     }
 
     private void fillSolutions(Participant participant, File participantFolder,
