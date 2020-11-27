@@ -151,8 +151,7 @@ public class DiffController implements Controller {
     }
 
     private void selectComparison(int comparisonIndex) {
-        if (-1 == comparisonIndex) return;
-        if (comparisonsListView.getItems().isEmpty()) return;
+        if (comparisonIndex < 0 || comparisonsListView.getItems().size() <= comparisonIndex) return;
 
         this.comparisonIndex = comparisonIndex;
         this.comparison = comparisonsListView.getItems().get(comparisonIndex);
