@@ -58,6 +58,26 @@ public class VerificationService extends Service.ServiceImpl {
         }
     }
 
+    public Status getExpectedStatus(Comparison comparison) {
+        Cluster[] leftClusters = participantToClusters.get(comparison.left);
+        if (null == leftClusters) return Status.IGNORED;
+
+        Cluster[] rightClusters = participantToClusters.get(comparison.right);
+        if (null == rightClusters) return Status.IGNORED;
+
+        int problemId = comparison.problemId;
+        Cluster leftCluster = leftClusters[problemId];
+        Cluster rightCluster = rightClusters[problemId];
+
+        if (leftCluster != rightCluster) {
+            return Status.IGNORED;
+        }
+
+        return leftCluster.areStrongConnected(comparison.left, comparison.right)
+                ? Status.PLAGIAT
+                : Status.UNKNOWN;
+    }
+
     public void setJuryComment(Cluster cluster, String comment) {
         cluster.setComment(jury, comment);
     }

@@ -1,22 +1,29 @@
 package com.slamur.plagiarism.controller;
 
 import java.net.URL;
+import java.util.EnumMap;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.function.Consumer;
 
 import com.slamur.plagiarism.model.parsing.Participant;
 import com.slamur.plagiarism.model.verification.Cluster;
 import com.slamur.plagiarism.model.verification.Comparison;
+import com.slamur.plagiarism.model.verification.Status;
 import com.slamur.plagiarism.service.Services;
 import com.slamur.plagiarism.utils.FxmlUtils;
 import javafx.collections.FXCollections;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
+import javafx.scene.layout.Background;
+import javafx.scene.layout.BackgroundFill;
+import javafx.scene.layout.CornerRadii;
+import javafx.scene.paint.Color;
 
 public class ClusterController implements Controller {
 
@@ -28,13 +35,7 @@ public class ClusterController implements Controller {
 
     @FXML public Button saveCommentButton;
 
-    @FXML public ListView<Participant> leftParticipantListView;
-
-    @FXML public ListView<Participant> rightParticipantListView;
-
-    @FXML public Label comparisonStatusLabel;
-
-    @FXML public Button goToComparisonButton;
+    @FXML public TableView<Participant> clusterComparisonsTableView;
 
     private Cluster cluster;
 
@@ -48,7 +49,7 @@ public class ClusterController implements Controller {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         initializeClusterPart();
         initializeCommentPart();
-        initializeParticipantsPart();
+        initializeClusterComparisonsPart();
 
         this.cluster = null;
     }
@@ -99,18 +100,7 @@ public class ClusterController implements Controller {
                 Services.verification().getJuryComment(cluster)
         );
 
-        setParticipants(cluster, leftParticipantListView);
-        setParticipants(cluster, rightParticipantListView);
-    }
-
-    private static void setParticipants(Cluster cluster, ListView<Participant> participantListView) {
-        participantListView.setItems(
-                FXCollections.observableList(
-                        cluster.getParticipants()
-                )
-        );
-
-        participantListView.getSelectionModel().select(0);
+        updateClusterComparisonsTableView();
     }
 
     private void initializeCommentPart() {
@@ -128,44 +118,86 @@ public class ClusterController implements Controller {
         clusterInfoTextArea.setText(cluster.toText());
     }
 
-    private void initializeParticipantsPart() {
-        initializeParticipantsListView(leftParticipantListView);
-        initializeParticipantsListView(rightParticipantListView);
+    private void initializeClusterComparisonsPart() {
 
-        goToComparisonButton.setOnAction(this::goToComparisonAction);
     }
 
-    private void initializeParticipantsListView(ListView<Participant> participantListView) {
-        participantListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        participantListView.getSelectionModel().selectedItemProperty().addListener(
-                (observableValue, oldParticipant, newParticipant) -> updateComparisonStatusAction()
+    private void updateClusterComparisonsTableView() {
+        var participants = cluster.getParticipants();
+
+        clusterComparisonsTableView.setItems(
+                FXCollections.observableList(participants)
         );
+
+        var columns = clusterComparisonsTableView.getColumns();
+        columns.clear();
+
+//        for (var columnParticipant : participants) {
+//            var column = new ButtonColumn<Participant>("" + columnParticipant.id);
+//
+//            column.setCellFactory(tableColumn -> new ComparisonButtonCell(columnParticipant, rowParticipant -> {
+//                goToComparison(rowParticipant, columnParticipant);
+//            }));
+//
+//            columns.add(column);
+//        }
     }
 
-    private Optional<Comparison> getSelectedComparison() {
-        var left = leftParticipantListView.getSelectionModel().getSelectedItem();
-        var right = rightParticipantListView.getSelectionModel().getSelectedItem();
+    private static final EnumMap<Status, Color> statusColors;
 
-        return  Services.verification().getComparison(
+    static {
+        statusColors = new EnumMap<>(Status.class);
+
+        statusColors.put(Status.NOT_SEEN, Color.GRAY);
+        statusColors.put(Status.IGNORED, Color.GREEN);
+        statusColors.put(Status.UNKNOWN, Color.YELLOW);
+        statusColors.put(Status.PLAGIAT, Color.RED);
+    }
+
+//    private class ComparisonButtonCell extends ButtonCell<Participant> {
+//
+//        private final Participant columnParticipant;
+//
+//        public ComparisonButtonCell(Participant columnParticipant, Consumer<Participant> consumer) {
+//            super("?", consumer);
+//            this.columnParticipant = columnParticipant;
+//        }
+//
+//        @Override
+//        protected void updateItem(Participant rowParticipant, boolean empty) {
+//            super.updateItem(rowParticipant, empty);
+//
+//            getComparison(rowParticipant, columnParticipant)
+//                    .ifPresentOrElse(
+//                            comparison -> {
+//                                Status expectedStatus = Services.verification().getExpectedStatus(comparison);
+//                                Status actualStatus = Services.verification().getStatus(comparison);
+//
+////                                buttonColumnCell.setText("" + expectedStatus.name().charAt(0));
+//
+//                                Color actualColor = statusColors.get(actualStatus);
+//                                setBackground(new Background(new BackgroundFill(actualColor, CornerRadii.EMPTY, null)));
+//                            },
+//                            () -> {
+//                                setText("");
+//                                setStyle("-fx-background-color: black ;");
+//                            }
+//                    );
+//        }
+//    }
+
+    public Optional<Comparison> getComparison(Participant left, Participant right) {
+        if (null == cluster) return Optional.empty();
+        if (left == right) return Optional.empty();
+
+        return Services.verification().getComparison(
                 cluster, left, right
         );
     }
 
-    private void updateComparisonStatusAction() {
-        getSelectedComparison()
-            .ifPresent(this::updateComparisonStatus);
-    }
-
-    private void updateComparisonStatus(Comparison comparison) {
-        var status = Services.verification().getStatus(comparison);
-        comparisonStatusLabel.setText(status.text);
-    }
-
-    public void goToComparisonAction(ActionEvent event) {
-        if (null == cluster) return;
-
-        getSelectedComparison()
-            .ifPresent(mainController::goToComparison);
+    public void goToComparison(Participant rowParticipant, Participant columnParticipant) {
+        getComparison(rowParticipant, columnParticipant)
+                .ifPresent(mainController::goToComparison);
     }
 
 }

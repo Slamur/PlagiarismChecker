@@ -9,26 +9,20 @@
 
     <TextArea fx:id="clusterInfoTextArea"
               GridPane.columnIndex="1" GridPane.rowIndex="0"
-              GridPane.rowSpan="4"/>
+              GridPane.columnSpan="4"
+              GridPane.rowSpan="3"/>
 
     <TextArea fx:id="commentTextArea"
-              GridPane.columnIndex="2" GridPane.rowIndex="0"
-              GridPane.columnSpan="3"/>
+              GridPane.columnIndex="1" GridPane.rowIndex="3"
+              GridPane.columnSpan="4"
+    />
 
     <Button fx:id="saveCommentButton" text="Сохранить комментарий"
-            GridPane.columnIndex="3" GridPane.rowIndex="1"/>
+            GridPane.columnIndex="5" GridPane.rowIndex="3"/>
 
-    <ListView fx:id="leftParticipantListView"
-              GridPane.columnIndex="2" GridPane.rowIndex="2"
-              GridPane.rowSpan="2"/>
-
-    <ListView fx:id="rightParticipantListView"
-              GridPane.columnIndex="4" GridPane.rowIndex="2"
-              GridPane.rowSpan="2"/>
-
-    <Label fx:id="comparisonStatusLabel" GridPane.columnIndex="3" GridPane.rowIndex="2" />
-
-    <Button fx:id="goToComparisonButton" text="Перейти к сравнению"
-            GridPane.columnIndex="3" GridPane.rowIndex="3" />
+    <TableView fx:id="clusterComparisonsTableView"
+               GridPane.columnIndex="5" GridPane.rowIndex="0"
+               GridPane.rowSpan="3" GridPane.columnSpan="4"
+    />
 
 </GridPane>

@@ -253,4 +253,8 @@ public class Cluster {
 
         return dividedCluster;
     }
+
+    public boolean areStrongConnected(Participant left, Participant right) {
+        return participantToClique.get(left) == participantToClique.get(right);
+    }
 }
