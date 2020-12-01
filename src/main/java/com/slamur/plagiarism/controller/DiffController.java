@@ -209,14 +209,14 @@ public class DiffController implements Controller {
         leftParticipantInfoTextArea.setEditable(false);
         rightParticipantInfoTextArea.setEditable(false);
 
-        double participantAreaHeight = FxmlUtils.getScreenSize().height / 10.0;
+        double participantAreaHeight = FxmlUtils.getScreenSize().getHeight() / 10.0;
 
         leftParticipantInfoTextArea.setPrefHeight(participantAreaHeight);
         rightParticipantInfoTextArea.setPrefHeight(participantAreaHeight);
     }
 
     private void initializeCodePart() {
-        double codeAreaHeight = FxmlUtils.getScreenSize().height * 2.0 / 3.0;
+        double codeAreaHeight = FxmlUtils.getScreenSize().getHeight() * 2.0 / 3.0;
 
         leftCodeTextArea.setPrefHeight(codeAreaHeight);
         rightCodeTextArea.setPrefHeight(codeAreaHeight);

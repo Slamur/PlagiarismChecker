@@ -73,7 +73,7 @@ public class ClusterController implements Controller {
 
     private void initializeClusterInfoTextArea() {
         clusterInfoTextArea.setPrefHeight(
-                FxmlUtils.getScreenSize().height
+                FxmlUtils.getScreenSize().getHeight()
         );
     }
 

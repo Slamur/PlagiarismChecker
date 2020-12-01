@@ -1,21 +1,18 @@
 package com.slamur.plagiarism.utils;
 
-import java.awt.Desktop;
-import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.io.IOException;
-import java.net.URISyntaxException;
-import java.net.URL;
 
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Rectangle2D;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.stage.Screen;
 import javafx.stage.Stage;
 
 public class FxmlUtils {
 
-    public static Dimension getScreenSize() {
-        return Toolkit.getDefaultToolkit().getScreenSize();
+    public static Rectangle2D getScreenSize() {
+        return Screen.getPrimary().getVisualBounds();
     }
 
     private static String toSceneFileName(String sceneName) {
@@ -40,11 +37,11 @@ public class FxmlUtils {
     }
 
     public static Scene createScene(String sceneName) {
-        Dimension screenSize = getScreenSize();
-        return createScene(sceneName, screenSize.width, screenSize.height);
+        var screenSize = getScreenSize();
+        return createScene(sceneName, screenSize.getWidth(), screenSize.getHeight());
     }
 
-    private static Scene createScene(String sceneName, int width, int height) {
+    private static Scene createScene(String sceneName, double width, double height) {
         Parent root = createParent(sceneName);
         return new Scene(root, width, height);
     }
