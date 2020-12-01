@@ -46,14 +46,15 @@ public class FxmlUtils {
         return new Scene(root, width, height);
     }
 
-    public static void showStage(Scene scene, String title) {
-        showStage(new Stage(), scene, title);
+    public static Stage showStage(Scene scene, String title) {
+        return showStage(new Stage(), scene, title);
     }
 
-    public static void showStage(Stage stage, Scene scene, String title) {
+    public static Stage showStage(Stage stage, Scene scene, String title) {
         stage.setTitle(title);
         stage.setScene(scene);
         stage.show();
+        return stage;
     }
 
 }
