@@ -120,7 +120,7 @@ public class ClusterController implements Controller {
     private void saveCommentAction(ActionEvent event) {
         if (null == cluster) return;
 
-        String comment = commentTextArea.getText();
+        String comment = commentTextArea.getText().replace("\n", "; ");
         Services.verification().setJuryComment(
                 cluster, comment
         );
