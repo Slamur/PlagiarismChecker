@@ -107,6 +107,8 @@ public class DiffController implements Controller {
         comparisonsListView.setVisible(!isBlindMode);
         leftParticipantInfoTextArea.setVisible(!isBlindMode);
         rightParticipantInfoTextArea.setVisible(!isBlindMode);
+
+        showSelectedComparison();
     }
 
     private void initializeComparisonInfoPart() {
