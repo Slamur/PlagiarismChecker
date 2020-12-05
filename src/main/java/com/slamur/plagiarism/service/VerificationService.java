@@ -50,7 +50,6 @@ public class VerificationService extends Service.ServiceImpl {
 
         try {
             restoreDataFromFile();
-//                AlertUtils.information("Данные о кластерах восстановлены");
         } catch (IOException e) {
             AlertUtils.warning(
                     "Ошибка при восстановлении данных", e

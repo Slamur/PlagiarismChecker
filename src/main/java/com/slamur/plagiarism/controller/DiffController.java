@@ -118,8 +118,6 @@ public class DiffController implements Controller {
         Services.comparisons().afterInitialization(() -> Platform.runLater(() -> {
                 comparisonInfoLabel.setText("Данные загружены");
 
-    //                    AlertUtils.information("Данные о сравнениях восстановлены");
-
                 updateComparisonsListView();
 
                 selectComparison(0);
