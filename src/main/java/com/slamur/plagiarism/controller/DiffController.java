@@ -153,6 +153,7 @@ public class DiffController implements Controller {
 
         this.comparisonIndex = comparisonIndex;
         this.comparison = comparisonsListView.getItems().get(comparisonIndex);
+        comparisonsListView.getSelectionModel().select(comparison);
 
         showSelectedComparison();
     }
