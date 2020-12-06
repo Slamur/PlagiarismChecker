@@ -8,13 +8,12 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import com.slamur.plagiarism.model.parsing.Contest;
@@ -24,6 +23,7 @@ import com.slamur.plagiarism.model.parsing.Verdict;
 import com.slamur.plagiarism.model.verification.Comparison;
 import com.slamur.plagiarism.service.Services;
 import com.slamur.plagiarism.utils.AlertUtils;
+import com.slamur.plagiarism.utils.RandomUtils;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
@@ -63,8 +63,6 @@ public class ComparisonService extends ServiceBase {
 
         loadComparisons(participants);
         generateComparisons(participants);
-
-        orderComparisons();
     }
 
     private void loadComparisons(List<Participant> participants) {
@@ -136,24 +134,6 @@ public class ComparisonService extends ServiceBase {
         }
     }
 
-    private void orderComparisons() {
-        List<Comparison>[] problemToComparisons = IntStream.range(0, Services.contest().getProblemsCount())
-                .mapToObj(problemId -> new ArrayList<>())
-                .toArray(List[]::new);
-
-        comparisons.forEach(
-                comparison -> problemToComparisons[comparison.problemId].add(comparison)
-        );
-
-        comparisons.clear();
-
-        Arrays.stream(problemToComparisons)
-                .forEach(problemComparisons -> {
-                    Collections.shuffle(problemComparisons);
-                    comparisons.addAll(problemComparisons);
-                });
-    }
-
     public Comparison compare(Participant left, Participant right, int problemIndex) {
         var leftSolution = left.solutions[problemIndex];
         var rightSolution = right.solutions[problemIndex];
@@ -185,13 +165,38 @@ public class ComparisonService extends ServiceBase {
         }
     }
 
-    public ObservableList<Comparison> getComparisons(Predicate<Comparison> predicate) {
-        return comparisons.filtered(predicate);
+    public ObservableList<Comparison> ordered() {
+        List<List<Comparison>> problemToComparisons = IntStream.range(0, Services.contest().getProblemsCount())
+                .mapToObj(problemId -> new ArrayList<Comparison>())
+                .collect(Collectors.toList());
+
+        comparisons.forEach(
+                comparison -> problemToComparisons.get(comparison.problemId).add(comparison)
+        );
+
+        var orderedComparisons = FXCollections.<Comparison>observableArrayList();
+
+        problemToComparisons
+                .forEach(problemComparisons -> {
+                    RandomUtils.shuffle(problemComparisons, Services.properties().getJury().hashCode());
+                    orderedComparisons.addAll(problemComparisons);
+                });
+
+        return orderedComparisons;
+    }
+
+    public ObservableList<Comparison> filtered(Predicate<Comparison> predicate) {
+        return ordered().filtered(predicate);
     }
 
     public Predicate<Comparison> moreThan(double minSimilarity) {
         return (comparison) ->
-                similarityByComparison.getOrDefault(comparison, 0.0) > minSimilarity;
+                similarityByComparison.getOrDefault(comparison, 0.0) >= minSimilarity;
+    }
+
+    public Predicate<Comparison> forProblem(List<Integer> expectedProblems) {
+        return (comparison) ->
+                expectedProblems.contains(comparison.problemId);
     }
 }
 
