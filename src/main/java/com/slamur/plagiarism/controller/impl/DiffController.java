@@ -237,7 +237,19 @@ public class DiffController extends TabController {
         goToClusterButton.setDisable(cluster.isEmpty());
 
         comparisonInfoLabel.setText(comparison.getProblemName());
-        comparisonStatusLabel.setText(Services.verification().getStatus(comparison).text);
+
+        var verification = Services.verification();
+
+        Status actualStatus = verification.getStatus(comparison);
+        Status expectedStatus = verification.getExpectedStatus(comparison);
+
+        String expectedStatusText = (Status.NOT_SEEN == expectedStatus)
+                ? "Непонятно"
+                : expectedStatus.text;
+
+        comparisonStatusLabel.setText(
+                String.format("%s%n(%s)", actualStatus.text, expectedStatusText)
+        );
 
         showParticipantSolution(comparison.left, comparison.problemId, leftCodeInfoLabel, leftParticipantInfoTextArea, leftCodeTextArea);
         showParticipantSolution(comparison.right, comparison.problemId, rightCodeInfoLabel, rightParticipantInfoTextArea, rightCodeTextArea);
