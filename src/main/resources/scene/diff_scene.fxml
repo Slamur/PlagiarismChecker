@@ -8,9 +8,9 @@
     <VBox fx:id="comparisonsVBox" spacing="20.0" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.rowSpan="5">
         <ListView fx:id="comparisonsListView"/>
 
-        <HBox fx:id="problemFiltersHBox"/>
+        <HBox fx:id="problemFiltersHBox" spacing="20.0"/>
 
-        <HBox fx:id="statusFiltersHBox"/>
+        <HBox fx:id="statusFiltersHBox" spacing="10.0"/>
 
         <HBox>
             <Label text="Минимальная схожесть"/>
