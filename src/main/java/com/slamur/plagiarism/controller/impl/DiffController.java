@@ -461,6 +461,16 @@ public class DiffController extends TabController {
 
         useClusterFilterCheckBox.setSelected(true);
 
+        for (var problemFilter : problemFilters) {
+            problemFilter.setSelected(false);
+        }
+
+        problemFilters[cluster.getProblemId()].setSelected(true);
+
+        for (var statusFilter : statusFilters.values()) {
+            statusFilter.setSelected(true);
+        }
+
         updateComparisonsListView();
     }
 }
