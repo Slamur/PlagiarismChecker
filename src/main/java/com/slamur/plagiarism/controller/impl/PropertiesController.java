@@ -5,6 +5,7 @@ import java.util.ResourceBundle;
 
 import com.slamur.plagiarism.service.Services;
 import com.slamur.plagiarism.utils.AlertUtils;
+import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -25,21 +26,27 @@ public class PropertiesController extends TabController {
     }
 
     private void initCredentialsPart() {
-        Services.properties().afterInitialization(() -> {
-            loginTextField.setText(
-                    Services.properties().getLogin()
-            );
+        Services.properties().afterInitialization(() -> Platform.runLater(
+                () -> {
+                    loginTextField.setText(
+                            Services.properties().getLogin()
+                    );
 
-            passwordTextField.setText(
-                    Services.properties().getPassword()
-            );
-        });
+                    passwordTextField.setText(
+                            Services.properties().getPassword()
+                    );
+                }
+            )
+        );
     }
 
     private void initCommentsPart() {
-        Services.properties().afterInitialization(() -> juryTextField.setText(
-                Services.properties().getJury()
-        ));
+        Services.properties().afterInitialization(() -> Platform.runLater(
+                () -> juryTextField.setText(
+                    Services.properties().getJury()
+                )
+            )
+        );
     }
 
     private void initSavePart() {
