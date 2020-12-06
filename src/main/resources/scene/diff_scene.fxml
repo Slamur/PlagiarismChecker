@@ -5,7 +5,9 @@
 
 <GridPane alignment="center" hgap="10" vgap="10" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.slamur.plagiarism.controller.DiffController">
 
-    <ListView fx:id="comparisonsListView" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.rowSpan="5" />
+    <VBox fx:id="comparisonsVBox" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.rowSpan="5">
+        <ListView fx:id="comparisonsListView" />
+    </VBox>
 
     <TextArea fx:id="leftParticipantInfoTextArea" prefHeight="100.0" GridPane.columnIndex="1" GridPane.rowIndex="0" />
 

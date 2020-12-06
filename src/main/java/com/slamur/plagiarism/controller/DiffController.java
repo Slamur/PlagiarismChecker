@@ -19,8 +19,11 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextArea;
+import javafx.scene.layout.VBox;
 
 public class DiffController implements Controller {
+
+    @FXML public VBox comparisonsVBox;
 
     @FXML public ListView<Comparison> comparisonsListView;
 
@@ -104,7 +107,7 @@ public class DiffController implements Controller {
     }
 
     private void updateViewForMode(boolean isBlindMode) {
-        comparisonsListView.setVisible(!isBlindMode);
+        comparisonsVBox.setVisible(!isBlindMode);
         leftParticipantInfoTextArea.setVisible(!isBlindMode);
         rightParticipantInfoTextArea.setVisible(!isBlindMode);
 
@@ -161,6 +164,8 @@ public class DiffController implements Controller {
     }
 
     private void showSelectedComparison() {
+        if (null == comparison) return;
+
         var cluster = Services.verification().getCluster(comparison);
         goToClusterButton.setDisable(cluster.isEmpty());
 
