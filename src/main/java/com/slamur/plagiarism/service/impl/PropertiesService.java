@@ -44,15 +44,21 @@ public class PropertiesService extends ServiceBase  {
         return appProperties.getProperty(loginProperty, "");
     }
 
+    public void setLogin(String login) { appProperties.setProperty(loginProperty, login); }
+
     public String getPassword() {
         return appProperties.getProperty(passwordProperty, "");
     }
+
+    public void setPassword(String password) { appProperties.setProperty(passwordProperty, password); }
 
     public String getJury() {
         return appProperties.getProperty(juryProperty, "Jury" + this.hashCode());
     }
 
-    public void saveProperties() {
+    public void setJury(String jury) { appProperties.setProperty(juryProperty, jury); }
+
+    public void saveToFile() {
         try (var out = new PrintWriter(propertiesFileName)) {
             appProperties.store(out, "Properties of jury " + getJury());
         } catch (IOException e) {
