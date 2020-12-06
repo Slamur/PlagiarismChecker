@@ -134,8 +134,12 @@ public class Cluster {
 
     @Override
     public String toString() {
-        int firstParticipantId = getParticipants().stream().findFirst().map(p -> p.id).orElse(-1);
-        return firstParticipantId + " " + ModelUtils.getProblemName(problemId);
+        int minParticipantId = getParticipants().stream()
+                .mapToInt(participant -> participant.id)
+                .min()
+                .orElse(-1);
+
+        return minParticipantId + " " + ModelUtils.getProblemName(problemId);
     }
 
     public void mergeCliques(Participant left, Participant right) {
