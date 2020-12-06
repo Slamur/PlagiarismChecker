@@ -30,13 +30,11 @@ public class VerificationService extends ServiceBase {
     private File verificationFile;
 
     private final ObservableList<Cluster> clusters;
-    private final Map<Comparison, Cluster> comparisonToCluster;
     private final Map<Comparison, Status> comparisonToStatus;
     private final Map<Participant, Cluster[]> participantToClusters;
 
     public VerificationService() {
         this.clusters = FXCollections.observableArrayList();
-        this.comparisonToCluster = new HashMap<>();
         this.comparisonToStatus = new HashMap<>();
         this.participantToClusters = new HashMap<>();
     }
@@ -93,7 +91,6 @@ public class VerificationService extends ServiceBase {
             }
 
             var resultCluster = mergeClusters(leftCluster, rightCluster);
-            comparisonToCluster.put(comparison, resultCluster);
 
             if (Status.PLAGIAT == status) {
                 resultCluster.setStrongEdge(left, right);
@@ -205,19 +202,15 @@ public class VerificationService extends ServiceBase {
     }
 
     public Optional<Cluster> getCluster(Comparison comparison) {
-        var cluster = comparisonToCluster.get(comparison);
+        var left = comparison.left;
+        var right = comparison.right;
 
-        if (null == cluster) {
-            var left = comparison.left;
-            var right = comparison.right;
+        var leftCluster = getCluster(left, comparison.problemId);
+        var rightCluster = getCluster(right, comparison.problemId);
 
-            var leftCluster = getCluster(left, comparison.problemId);
-            var rightCluster = getCluster(right, comparison.problemId);
-
-            if (leftCluster == rightCluster) {
-                cluster = leftCluster;
-            }
-        }
+        Cluster cluster = (leftCluster == rightCluster)
+                ? leftCluster
+                : null;
 
         return Optional.ofNullable(cluster);
     }
