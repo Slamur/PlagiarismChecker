@@ -377,7 +377,8 @@ public class VerificationService extends ServiceBase {
 
     public Predicate<Comparison> withStatus(List<Status> expectedStatuses) {
         return (comparison) ->
-                expectedStatuses.contains(getStatus(comparison));
+                expectedStatuses.contains(getStatus(comparison))
+                || expectedStatuses.contains(getExpectedStatus(comparison));
     }
 
     public Predicate<Comparison> fromCluster(List<Cluster> clusters) {
