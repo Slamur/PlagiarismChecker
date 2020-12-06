@@ -19,6 +19,7 @@ import com.slamur.plagiarism.utils.StreamUtils;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.scene.control.Button;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
@@ -27,8 +28,15 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.cell.TextFieldListCell;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
 
 public class DiffController extends TabController {
 
@@ -200,6 +208,61 @@ public class DiffController extends TabController {
                 (observableValue, oldComparisonIndex, newComparisonIndex)
                         -> selectComparison(newComparisonIndex.intValue())
         );
+
+        comparisonsListView.setCellFactory(comparisonListView -> new ComparisonListCell());
+    }
+
+    private static class ComparisonListCell extends TextFieldListCell<Comparison> {
+
+        private static final EnumMap<Status, Color> statusToColor;
+
+        static {
+            statusToColor = new EnumMap<>(Status.class);
+
+            statusToColor.put(Status.NOT_SEEN, Color.WHITE);
+            statusToColor.put(Status.IGNORED, Color.GREEN);
+            statusToColor.put(Status.UNKNOWN, Color.YELLOW);
+            statusToColor.put(Status.PLAGIAT, Color.RED);
+        }
+
+        public ComparisonListCell() {
+            super();
+        }
+
+        @Override
+        public void updateItem(Comparison comparison, boolean isEmpty) {
+            super.updateItem(comparison, isEmpty);
+
+            if (!isEmpty) {
+                var verification = Services.verification();
+
+                var actualStatus = verification.getStatus(comparison);
+                var expectedStatus = verification.getExpectedStatus(comparison);
+
+                var actualColor = statusToColor.get(actualStatus);
+                var expectedColor = statusToColor.get(expectedStatus);
+
+                setBorder(
+                        new Border(
+                                new BorderStroke(
+                                        actualColor,
+                                        expectedColor,
+                                        expectedColor,
+                                        actualColor,
+                                        BorderStrokeStyle.SOLID,
+                                        BorderStrokeStyle.SOLID,
+                                        BorderStrokeStyle.SOLID,
+                                        BorderStrokeStyle.SOLID,
+                                        CornerRadii.EMPTY,
+                                        new BorderWidths(5),
+                                        Insets.EMPTY
+                                )
+                        )
+                );
+            } else {
+                setBorder(new Border(new BorderStroke(Color.WHITE, BorderStrokeStyle.NONE, CornerRadii.EMPTY, BorderWidths.EMPTY)));
+            }
+        }
     }
 
     private void updateComparisonsListView() {
