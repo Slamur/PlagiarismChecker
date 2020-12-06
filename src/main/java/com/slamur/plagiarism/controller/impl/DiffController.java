@@ -129,7 +129,7 @@ public class DiffController extends TabController {
                 (observableValue, wasBlind, nowBlind) -> updateViewForMode(nowBlind)
         );
 
-        blindModeCheckBox.selectedProperty().setValue(true);
+        blindModeCheckBox.setSelected(false);
     }
 
     private void updateViewForMode(boolean isBlindMode) {
