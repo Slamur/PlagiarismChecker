@@ -151,8 +151,14 @@ public class ClusterController extends TabController {
     }
 
     private void updateComparisonStatus(Comparison comparison) {
-        var status = Services.verification().getStatus(comparison);
-        comparisonStatusLabel.setText(status.text);
+        var verification = Services.verification();
+
+        var actualStatus = verification.getStatus(comparison);
+        var expectedStatus = verification.getExpectedStatus(comparison);
+
+        comparisonStatusLabel.setText(
+                String.format("%s%n(%s)", actualStatus.text, expectedStatus.text)
+        );
     }
 
     public void goToComparisonAction(ActionEvent event) {
