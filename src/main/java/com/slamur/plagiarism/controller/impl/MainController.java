@@ -1,11 +1,12 @@
-package com.slamur.plagiarism.controller;
+package com.slamur.plagiarism.controller.impl;
 
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import com.slamur.plagiarism.controller.Controller;
 import com.slamur.plagiarism.model.verification.Cluster;
 import com.slamur.plagiarism.model.verification.Comparison;
-import com.slamur.plagiarism.service.FxmlStageService;
+import com.slamur.plagiarism.service.impl.FxmlStageService;
 import com.slamur.plagiarism.service.Services;
 import com.slamur.plagiarism.utils.AlertUtils;
 import javafx.event.ActionEvent;

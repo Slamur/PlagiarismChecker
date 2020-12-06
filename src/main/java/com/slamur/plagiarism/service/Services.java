@@ -1,5 +1,11 @@
 package com.slamur.plagiarism.service;
 
+import com.slamur.plagiarism.service.impl.ComparisonService;
+import com.slamur.plagiarism.service.impl.ContestService;
+import com.slamur.plagiarism.service.impl.CredentialsService;
+import com.slamur.plagiarism.service.impl.PropertiesService;
+import com.slamur.plagiarism.service.impl.VerificationService;
+
 public class Services {
 
     private static final Services instance = new Services();
@@ -9,16 +15,17 @@ public class Services {
     }
 
     private static void initializeServices() {
-        contest().afterInitialization(() -> {
-            comparisons().initialize();
-        });
+        properties().afterInitialization(credentials()::initialize);
+        credentials().afterInitialization(contest()::initialize);
+        contest().afterInitialization(comparisons()::initialize);
+        comparisons().afterInitialization(verification()::initialize);
 
-        comparisons().afterInitialization(() -> {
-            verification().initialize();
-        });
-
-        contest().initialize();
+        properties().initialize();
     }
+
+    public static PropertiesService properties() { return instance.propertiesService; }
+
+    public static CredentialsService credentials() { return instance.credentialsService; }
 
     public static ContestService contest() {
         return instance.contestService;
@@ -32,11 +39,15 @@ public class Services {
         return instance.verificationService;
     }
 
+    private final PropertiesService propertiesService;
+    private final CredentialsService credentialsService;
     private final ContestService contestService;
     private final ComparisonService comparisonService;
     private final VerificationService verificationService;
 
     private Services() {
+        this.propertiesService = new PropertiesService();
+        this.credentialsService = new CredentialsService();
         this.contestService = new ContestService();
         this.comparisonService = new ComparisonService();
         this.verificationService = new VerificationService();

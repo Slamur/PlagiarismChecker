@@ -1,4 +1,4 @@
-package com.slamur.plagiarism.service;
+package com.slamur.plagiarism.service.impl;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -26,6 +26,7 @@ import com.slamur.plagiarism.model.parsing.Participant;
 import com.slamur.plagiarism.model.parsing.ParticipantInfo;
 import com.slamur.plagiarism.model.parsing.Solution;
 import com.slamur.plagiarism.model.parsing.Verdict;
+import com.slamur.plagiarism.service.Services;
 import com.slamur.plagiarism.utils.AlertUtils;
 import com.slamur.plagiarism.utils.IOUtils;
 import com.slamur.plagiarism.utils.ParsingUtils;
@@ -35,7 +36,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.parser.Parser;
 
-public class ContestService extends Service.ServiceImpl {
+public class ContestService extends ServiceBase {
 
     public static final Contest OKRUG_2020 = new Contest(
             Contest.CITY, 579,
@@ -141,7 +142,7 @@ public class ContestService extends Service.ServiceImpl {
         Set<String> totalParticipantLinks = new HashSet<>(getDirectoryLinks(participantsFolder));
 
         ContestRequestProcessor requestProcessor = new ContestRequestProcessor(
-                CredentialsService.getCredentialCookies()
+                Services.credentials().getCredentialCookies()
         );
 
         totalParticipantLinks.addAll(

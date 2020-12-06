@@ -1,4 +1,4 @@
-package com.slamur.plagiarism.service;
+package com.slamur.plagiarism.service.impl;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -15,24 +15,24 @@ import com.slamur.plagiarism.model.parsing.Participant;
 import com.slamur.plagiarism.model.verification.Cluster;
 import com.slamur.plagiarism.model.verification.Comparison;
 import com.slamur.plagiarism.model.verification.Status;
+import com.slamur.plagiarism.service.Services;
 import com.slamur.plagiarism.utils.AlertUtils;
 import com.slamur.plagiarism.utils.IOUtils;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-public class VerificationService extends Service.ServiceImpl {
+public class VerificationService extends ServiceBase {
 
     private static final String verificationFileName = "verification";
 
     private File verificationFile;
 
-    private String jury;
     private final ObservableList<Cluster> clusters;
     private final Map<Comparison, Cluster> comparisonToCluster;
     private final Map<Comparison, Status> comparisonToStatus;
     private final Map<Participant, Cluster[]> participantToClusters;
 
-    VerificationService() {
+    public VerificationService() {
         this.clusters = FXCollections.observableArrayList();
         this.comparisonToCluster = new HashMap<>();
         this.comparisonToStatus = new HashMap<>();
@@ -41,13 +41,6 @@ public class VerificationService extends Service.ServiceImpl {
 
     @Override
     protected void initializeOnly() {
-        var properties = PropertiesService.appProperties;
-
-        this.jury = properties.getProperty("jury");
-        if (null == jury) {
-            jury = "Jury " + this.hashCode();
-        }
-
         try {
             restoreDataFromFile();
         } catch (IOException e) {
@@ -58,10 +51,12 @@ public class VerificationService extends Service.ServiceImpl {
     }
 
     public void setJuryComment(Cluster cluster, String comment) {
+        String jury = Services.properties().getJury();
         cluster.setComment(jury, comment);
     }
 
     public String getJuryComment(Cluster cluster) {
+        String jury = Services.properties().getJury();
         return cluster.getComment(jury);
     }
 

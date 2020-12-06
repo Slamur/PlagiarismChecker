@@ -1,9 +1,10 @@
-package com.slamur.plagiarism.controller;
+package com.slamur.plagiarism.controller.impl;
 
 import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
+import com.slamur.plagiarism.controller.Controller;
 import com.slamur.plagiarism.model.parsing.Participant;
 import com.slamur.plagiarism.model.verification.Cluster;
 import com.slamur.plagiarism.model.verification.Comparison;

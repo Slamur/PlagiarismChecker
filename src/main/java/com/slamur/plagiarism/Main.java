@@ -1,6 +1,6 @@
 package com.slamur.plagiarism;
 
-import com.slamur.plagiarism.service.FxmlStageService;
+import com.slamur.plagiarism.service.impl.FxmlStageService;
 import javafx.application.Application;
 import javafx.stage.Stage;
 

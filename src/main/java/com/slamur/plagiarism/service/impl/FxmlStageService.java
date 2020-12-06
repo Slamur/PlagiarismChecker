@@ -1,7 +1,7 @@
-package com.slamur.plagiarism.service;
+package com.slamur.plagiarism.service.impl;
 
-import javafx.scene.Scene;
-import static com.slamur.plagiarism.utils.FxmlUtils.*;
+import static com.slamur.plagiarism.utils.FxmlUtils.createScene;
+import static com.slamur.plagiarism.utils.FxmlUtils.showStage;
 
 public class FxmlStageService {
 

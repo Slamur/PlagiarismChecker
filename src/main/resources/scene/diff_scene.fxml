@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<GridPane alignment="center" hgap="10" vgap="10" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.slamur.plagiarism.controller.DiffController">
+<GridPane alignment="center" hgap="10" vgap="10" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.slamur.plagiarism.controller.impl.DiffController">
 
     <VBox fx:id="comparisonsVBox" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.rowSpan="5">
         <ListView fx:id="comparisonsListView" />

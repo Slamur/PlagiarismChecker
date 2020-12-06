@@ -3,7 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
-<GridPane alignment="center" hgap="10" vgap="10" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1" fx:controller="com.slamur.plagiarism.controller.ClusterController">
+<GridPane alignment="center" hgap="10" vgap="10" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1" fx:controller="com.slamur.plagiarism.controller.impl.ClusterController">
 
     <ListView fx:id="clustersListView" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.rowSpan="4" />
 

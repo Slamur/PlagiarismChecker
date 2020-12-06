@@ -1,4 +1,4 @@
-package com.slamur.plagiarism.service;
+package com.slamur.plagiarism.service.impl;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -22,11 +22,12 @@ import com.slamur.plagiarism.model.parsing.Participant;
 import com.slamur.plagiarism.model.parsing.Solution;
 import com.slamur.plagiarism.model.parsing.Verdict;
 import com.slamur.plagiarism.model.verification.Comparison;
+import com.slamur.plagiarism.service.Services;
 import com.slamur.plagiarism.utils.AlertUtils;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 
-public class ComparisonService extends Service.ServiceImpl {
+public class ComparisonService extends ServiceBase {
 
     private static final boolean waScan = false;
     private static final double solutionSimilarityFilter = 0.9;
@@ -38,7 +39,7 @@ public class ComparisonService extends Service.ServiceImpl {
 
     private File comparisonsFile;
 
-    ComparisonService() {
+    public ComparisonService() {
         this.comparisons = FXCollections.observableArrayList();
         this.similarityByComparison = new HashMap<>();
     }
