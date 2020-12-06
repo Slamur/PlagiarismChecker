@@ -5,8 +5,10 @@ import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.ResourceBundle;
+import java.util.function.Predicate;
 
 import com.slamur.plagiarism.model.parsing.Participant;
+import com.slamur.plagiarism.model.verification.Cluster;
 import com.slamur.plagiarism.model.verification.Comparison;
 import com.slamur.plagiarism.model.verification.Status;
 import com.slamur.plagiarism.service.Services;
@@ -38,6 +40,10 @@ public class DiffController extends TabController {
     @FXML public HBox statusFiltersHBox;
 
     @FXML public Spinner<Double> minSimilaritySpinner;
+
+    @FXML public CheckBox useClusterFilterCheckBox;
+
+    @FXML public ListView<Cluster> clusterFiltersListView;
 
     @FXML public Button filterComparisonsButton;
 
@@ -156,14 +162,23 @@ public class DiffController extends TabController {
                 )
         );
 
+        clusterFiltersListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+
+        Services.verification().afterInitialization(() -> Platform.runLater(
+                () -> clusterFiltersListView.setItems(
+                    Services.verification().getClusters()
+                )
+            )
+        );
+
         filterComparisonsButton.setOnAction(actionEvent -> updateComparisonsListView());
 
         for (CheckBox problemFilter : problemFilters) {
             problemFilter.setSelected(true);
         }
 
-        for (Status status : new Status[] { Status.NOT_SEEN }) {
-            statusFilters.get(status).setSelected(true);
+        for (CheckBox statusFilter : statusFilters.values()) {
+            statusFilter.setSelected(true);
         }
     }
 
@@ -204,15 +219,23 @@ public class DiffController extends TabController {
         }
 
         var comparisons = Services.comparisons();
+        var verification = Services.verification();
+
+        Predicate<Comparison> clusterFilter = useClusterFilterCheckBox.isSelected()
+                ? verification.fromCluster(
+                        clusterFiltersListView.getSelectionModel().getSelectedItems()
+                )
+                : (comparison) -> true;
+
+        var predicate = StreamUtils.and(
+                comparisons.moreThan(minSimilarity),
+                comparisons.forProblem(expectedProblems),
+                verification.withStatus(expectedStatuses),
+                clusterFilter
+        );
 
         comparisonsListView.setItems(
-                comparisons.filtered(
-                        StreamUtils.and(
-                                comparisons.moreThan(minSimilarity),
-                                comparisons.forProblem(expectedProblems),
-                                Services.verification().withStatus(expectedStatuses)
-                        )
-                )
+                comparisons.filtered(predicate)
         );
     }
 

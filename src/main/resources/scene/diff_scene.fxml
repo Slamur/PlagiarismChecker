@@ -12,12 +12,17 @@
 
         <HBox fx:id="statusFiltersHBox" spacing="10.0"/>
 
-        <HBox>
+        <HBox spacing="10.0">
             <Label text="Минимальная схожесть"/>
             <Spinner fx:id="minSimilaritySpinner"/>
         </HBox>
 
-        <Button fx:id="filterComparisonsButton" text="Применить фильтры"/>
+        <HBox spacing="10.0">
+            <CheckBox fx:id="useClusterFilterCheckBox" text="Фильтр по кластерам"/>
+            <Button fx:id="filterComparisonsButton" text="Применить фильтры"/>
+        </HBox>
+
+        <ListView fx:id="clusterFiltersListView"/>
     </VBox>
 
     <TextArea fx:id="leftParticipantInfoTextArea" prefHeight="100.0" GridPane.columnIndex="1" GridPane.rowIndex="0" />
