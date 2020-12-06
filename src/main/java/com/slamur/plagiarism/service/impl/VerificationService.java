@@ -205,7 +205,21 @@ public class VerificationService extends ServiceBase {
     }
 
     public Optional<Cluster> getCluster(Comparison comparison) {
-        return Optional.ofNullable(comparisonToCluster.get(comparison));
+        var cluster = comparisonToCluster.get(comparison);
+
+        if (null == cluster) {
+            var left = comparison.left;
+            var right = comparison.right;
+
+            var leftCluster = getCluster(left, comparison.problemId);
+            var rightCluster = getCluster(right, comparison.problemId);
+
+            if (leftCluster == rightCluster) {
+                cluster = leftCluster;
+            }
+        }
+
+        return Optional.ofNullable(cluster);
     }
 
     public ObservableList<Cluster> getClusters() {
