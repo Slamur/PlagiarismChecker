@@ -34,7 +34,7 @@ public class ClusterController extends TabController {
 
     @FXML public Label comparisonStatusLabel;
 
-    @FXML public Button goToComparisonButton;
+    @FXML public Button goToComparisonsButton;
 
     private Cluster cluster;
 
@@ -126,7 +126,7 @@ public class ClusterController extends TabController {
         initializeParticipantsListView(leftParticipantListView);
         initializeParticipantsListView(rightParticipantListView);
 
-        goToComparisonButton.setOnAction(this::goToComparisonAction);
+        goToComparisonsButton.setOnAction(this::goToComparisonAction);
     }
 
     private void initializeParticipantsListView(ListView<Participant> participantListView) {
@@ -146,26 +146,31 @@ public class ClusterController extends TabController {
     }
 
     private void updateComparisonStatusAction() {
-        getSelectedComparison()
-            .ifPresent(this::updateComparisonStatus);
+        updateComparisonStatus(getSelectedComparison());
     }
 
-    private void updateComparisonStatus(Comparison comparison) {
-        var verification = Services.verification();
+    private void updateComparisonStatus(Optional<Comparison> comparisonOptional) {
+        comparisonOptional.ifPresentOrElse(
+                (comparison) -> {
+                    var verification = Services.verification();
 
-        var actualStatus = verification.getStatus(comparison);
-        var expectedStatus = verification.getExpectedStatus(comparison);
+                    var actualStatus = verification.getStatus(comparison);
+                    var expectedStatus = verification.getExpectedStatus(comparison);
 
-        comparisonStatusLabel.setText(
-                String.format("%s%n(%s)", actualStatus.text, expectedStatus.text)
+                    comparisonStatusLabel.setText(
+                            String.format("%s%n(%s)", actualStatus.text, expectedStatus.text)
+                    );
+                },
+                () -> comparisonStatusLabel.setText("")
         );
     }
 
     public void goToComparisonAction(ActionEvent event) {
         if (null == cluster) return;
+        if (cluster.size() < 2) return;
 
-        getSelectedComparison()
-            .ifPresent(mainController::goToComparison);
+        mainController.showComparisonsFrom(cluster);
+        mainController.goTo(getSelectedComparison());
     }
 
 }

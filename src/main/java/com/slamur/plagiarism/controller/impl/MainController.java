@@ -1,6 +1,7 @@
 package com.slamur.plagiarism.controller.impl;
 
 import java.net.URL;
+import java.util.Optional;
 import java.util.ResourceBundle;
 
 import com.slamur.plagiarism.controller.Controller;
@@ -69,14 +70,18 @@ public class MainController implements Controller {
         tabPane.getSelectionModel().select(tab);
     }
 
-    public void goToComparison(Comparison comparison) {
-        selectTab(diffTab);
-        diffController.fullSelectComparison(comparison);
+    public void showComparisonsFrom(Cluster cluster) {
+        diffController.showFromCluster(cluster);
     }
 
-    public void goToCluster(Cluster cluster) {
-        selectTab(clusterTab);
+    public void goTo(Optional<Comparison> comparison) {
+        diffController.fullSelectComparison(comparison);
+        selectTab(diffTab);
+    }
+
+    public void goTo(Cluster cluster) {
         clusterController.fullSelectCluster(cluster);
+        selectTab(clusterTab);
     }
 
     private void initializeMenu() {

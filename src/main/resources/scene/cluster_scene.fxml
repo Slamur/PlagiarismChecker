@@ -28,7 +28,7 @@
 
     <Label fx:id="comparisonStatusLabel" GridPane.columnIndex="3" GridPane.rowIndex="2" />
 
-    <Button fx:id="goToComparisonButton" text="Перейти к сравнению"
+    <Button fx:id="goToComparisonsButton" text="Перейти к сравнениям"
             GridPane.columnIndex="3" GridPane.rowIndex="3" />
 
 </GridPane>

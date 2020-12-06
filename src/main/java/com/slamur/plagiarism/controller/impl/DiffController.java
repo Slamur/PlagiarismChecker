@@ -4,6 +4,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.function.Predicate;
 
@@ -239,8 +240,13 @@ public class DiffController extends TabController {
         );
     }
 
-    public void fullSelectComparison(Comparison comparison) {
-        comparisonsListView.getSelectionModel().select(comparison);
+    public void fullSelectComparison(Optional<Comparison> selectedComparison) {
+        var items = comparisonsListView.getItems();
+        if (items.isEmpty()) return;
+
+        comparisonsListView.getSelectionModel().select(
+                selectedComparison.orElse(items.get(0))
+        );
     }
 
     private void selectComparison(int comparisonIndex) {
@@ -381,6 +387,17 @@ public class DiffController extends TabController {
         if (null == comparison) return;
 
         Services.verification().getCluster(comparison)
-                .ifPresent(mainController::goToCluster);
+                .ifPresent(mainController::goTo);
+    }
+
+    public void showFromCluster(Cluster cluster) {
+        var clusterFiltersSelectionModel = clusterFiltersListView.getSelectionModel();
+
+        clusterFiltersSelectionModel.clearSelection();
+        clusterFiltersSelectionModel.select(cluster);
+
+        useClusterFilterCheckBox.setSelected(true);
+
+        updateComparisonsListView();
     }
 }
