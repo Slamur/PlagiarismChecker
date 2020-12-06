@@ -4,7 +4,6 @@ import java.net.URL;
 import java.util.List;
 import java.util.ResourceBundle;
 
-import com.slamur.plagiarism.controller.Controller;
 import com.slamur.plagiarism.model.parsing.Participant;
 import com.slamur.plagiarism.model.verification.Comparison;
 import com.slamur.plagiarism.model.verification.Status;
@@ -22,7 +21,7 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.VBox;
 
-public class DiffController implements Controller {
+public class DiffController extends TabController {
 
     @FXML public VBox comparisonsVBox;
 
@@ -60,12 +59,6 @@ public class DiffController implements Controller {
 
     private int comparisonIndex;
     private Comparison comparison;
-
-    private MainController mainController;
-
-    public void setMainController(MainController mainController) {
-        this.mainController = mainController;
-    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {

@@ -21,6 +21,10 @@
         <Tab fx:id="clusterTab">
             <fx:include fx:id="cluster" source="cluster_scene.fxml"/>
         </Tab>
+
+        <Tab fx:id="propertiesTab">
+            <fx:include fx:id="properties" source="properties_scene.fxml"/>
+        </Tab>
     </TabPane>
 
 </GridPane>

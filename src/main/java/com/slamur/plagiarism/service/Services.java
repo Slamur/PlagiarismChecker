@@ -3,6 +3,7 @@ package com.slamur.plagiarism.service;
 import com.slamur.plagiarism.service.impl.ComparisonService;
 import com.slamur.plagiarism.service.impl.ContestService;
 import com.slamur.plagiarism.service.impl.CredentialsService;
+import com.slamur.plagiarism.service.impl.FxmlStageService;
 import com.slamur.plagiarism.service.impl.PropertiesService;
 import com.slamur.plagiarism.service.impl.VerificationService;
 
@@ -23,6 +24,8 @@ public class Services {
         properties().initialize();
     }
 
+    public static FxmlStageService fxml() { return instance.fxmlService; }
+
     public static PropertiesService properties() { return instance.propertiesService; }
 
     public static CredentialsService credentials() { return instance.credentialsService; }
@@ -39,6 +42,7 @@ public class Services {
         return instance.verificationService;
     }
 
+    private final FxmlStageService fxmlService;
     private final PropertiesService propertiesService;
     private final CredentialsService credentialsService;
     private final ContestService contestService;
@@ -46,6 +50,7 @@ public class Services {
     private final VerificationService verificationService;
 
     private Services() {
+        this.fxmlService = new FxmlStageService();
         this.propertiesService = new PropertiesService();
         this.credentialsService = new CredentialsService();
         this.contestService = new ContestService();

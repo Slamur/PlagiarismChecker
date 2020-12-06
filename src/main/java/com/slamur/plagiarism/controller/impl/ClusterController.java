@@ -4,7 +4,6 @@ import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-import com.slamur.plagiarism.controller.Controller;
 import com.slamur.plagiarism.model.parsing.Participant;
 import com.slamur.plagiarism.model.verification.Cluster;
 import com.slamur.plagiarism.model.verification.Comparison;
@@ -19,7 +18,7 @@ import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextArea;
 
-public class ClusterController implements Controller {
+public class ClusterController extends TabController {
 
     @FXML public ListView<Cluster> clustersListView;
 
@@ -38,12 +37,6 @@ public class ClusterController implements Controller {
     @FXML public Button goToComparisonButton;
 
     private Cluster cluster;
-
-    private MainController mainController;
-
-    public void setMainController(MainController mainController) {
-        this.mainController = mainController;
-    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {

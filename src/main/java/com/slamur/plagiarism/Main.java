@@ -1,6 +1,6 @@
 package com.slamur.plagiarism;
 
-import com.slamur.plagiarism.service.impl.FxmlStageService;
+import com.slamur.plagiarism.service.Services;
 import javafx.application.Application;
 import javafx.stage.Stage;
 
@@ -8,7 +8,7 @@ public class Main extends Application {
 
     @Override
     public void start(Stage primaryStage) {
-        FxmlStageService.showMainStage();
+        Services.fxml().showMainStage();
     }
 
 

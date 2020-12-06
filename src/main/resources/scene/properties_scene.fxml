@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<GridPane alignment="center" hgap="10" vgap="10" xmlns:fx="http://javafx.com/fxml/1" xmlns="http://javafx.com/javafx/11.0.1" fx:controller="com.slamur.plagiarism.controller.impl.PropertiesController">
+
+    <VBox GridPane.rowIndex="0" GridPane.columnIndex="0"
+          GridPane.rowSpan="3" GridPane.columnSpan="2"
+          spacing="50.0" >
+        <Label text="Выгрузка данных с сайта"/>
+
+        <HBox spacing="20.0" >
+            <Label text="Логин"/>
+            <TextField fx:id="loginTextField"/>
+        </HBox>
+
+        <HBox spacing="20.0" >
+            <Label text="Пароль"/>
+            <TextField fx:id="passwordTextField"/>
+        </HBox>
+    </VBox>
+
+    <VBox GridPane.rowIndex="0" GridPane.columnIndex="2"
+          GridPane.rowSpan="2" GridPane.columnSpan="2"
+          spacing="50.0" >
+        <Label text="Комментарии"/>
+
+        <HBox spacing="20.0" >
+            <Label text="Идентификатор"/>
+            <TextField fx:id="juryTextField"/>
+        </HBox>
+
+        <Button fx:id="savePropertiesButton" text="Сохранить настройки"/>
+    </VBox>
+
+</GridPane>

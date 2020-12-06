@@ -6,7 +6,6 @@ import java.util.ResourceBundle;
 import com.slamur.plagiarism.controller.Controller;
 import com.slamur.plagiarism.model.verification.Cluster;
 import com.slamur.plagiarism.model.verification.Comparison;
-import com.slamur.plagiarism.service.impl.FxmlStageService;
 import com.slamur.plagiarism.service.Services;
 import com.slamur.plagiarism.utils.AlertUtils;
 import javafx.event.ActionEvent;
@@ -18,7 +17,15 @@ import javafx.stage.FileChooser;
 
 public class MainController implements Controller {
 
+    public static final String DIFF_TITLE = "Сверка решений";
+    public static final String CLUSTER_TITLE = "Кластеры списавших";
+    public static final String PROPERTIES_TITLE = "Настройки";
+
     @FXML public TabPane tabPane;
+
+    @FXML public Tab propertiesTab;
+
+    @FXML public PropertiesController propertiesController;
 
     @FXML public Tab diffTab;
 
@@ -48,11 +55,14 @@ public class MainController implements Controller {
     }
 
     private void initalizeControllers() {
-        diffController.setMainController(this);
-        clusterController.setMainController(this);
+        initializeTabController(propertiesController, propertiesTab, PROPERTIES_TITLE);
+        initializeTabController(diffController, diffTab, DIFF_TITLE);
+        initializeTabController(clusterController, clusterTab, CLUSTER_TITLE);
+    }
 
-        diffTab.setText(FxmlStageService.DIFF_TITLE);
-        clusterTab.setText(FxmlStageService.CLUSTER_TITLE);
+    private void initializeTabController(TabController tabController, Tab tab, String title) {
+        tabController.setMainController(this);
+        tab.setText(title);
     }
 
     private void selectTab(Tab tab) {
