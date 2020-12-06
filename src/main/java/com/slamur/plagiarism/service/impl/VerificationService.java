@@ -5,6 +5,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,10 +71,6 @@ public class VerificationService extends ServiceBase {
         );
     }
 
-    synchronized public Status getStatus(Comparison comparison) {
-        return comparisonToStatus.getOrDefault(comparison, Status.NOT_SEEN);
-    }
-
     synchronized public void setStatus(Comparison comparison, Status status) {
         if (getStatus(comparison).equals(status)) return;
         comparisonToStatus.put(comparison, status);
@@ -103,6 +100,38 @@ public class VerificationService extends ServiceBase {
             } else {
                 resultCluster.setWeakEdge(left, right);
             }
+        }
+    }
+
+    synchronized public Status getStatus(Comparison comparison) {
+        return comparisonToStatus.getOrDefault(comparison, Status.NOT_SEEN);
+    }
+
+    public Status getExpectedStatus(Comparison comparison) {
+        var left = comparison.left;
+        var right = comparison.right;
+
+        Cluster leftCluster = getCluster(left, comparison.problemId);
+        Cluster rightCluster = getCluster(right, comparison.problemId);
+
+        if (leftCluster != null && leftCluster == rightCluster) {
+            var leftClique = leftCluster.getClique(left);
+            var rightClique = rightCluster.getClique(right);
+
+            return (leftClique == rightClique) ? Status.PLAGIAT : Status.UNKNOWN;
+        } else {
+            var leftParticipants = (null == leftCluster ? Collections.singletonList(left) : leftCluster.getClique(left).getParticipants());
+            var rightParticipants = (null == rightCluster ? Collections.singletonList(right) : rightCluster.getClique(right).getParticipants());
+
+            for (var leftParticipant : leftParticipants) {
+                for (var rightParticipant : rightParticipants) {
+                    if (Status.IGNORED == getStatus(new Comparison(leftParticipant, rightParticipant, comparison.problemId))) {
+                        return Status.IGNORED;
+                    }
+                }
+            }
+
+            return Status.NOT_SEEN;
         }
     }
 
