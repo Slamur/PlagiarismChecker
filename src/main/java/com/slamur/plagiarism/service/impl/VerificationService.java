@@ -379,4 +379,10 @@ public class VerificationService extends ServiceBase {
         return (comparison) ->
                 expectedStatuses.contains(getStatus(comparison));
     }
+
+    public Predicate<Comparison> fromCluster(List<Cluster> clusters) {
+        return (comparison) -> getCluster(comparison)
+                .map(clusters::contains)
+                .orElse(false);
+    }
 }
