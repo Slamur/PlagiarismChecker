@@ -257,4 +257,8 @@ public class Cluster {
 
         return dividedCluster;
     }
+
+    public Clique getClique(Participant participant) {
+        return participantToClique.get(participant);
+    }
 }
