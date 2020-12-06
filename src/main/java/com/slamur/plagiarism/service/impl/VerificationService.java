@@ -6,6 +6,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.StringTokenizer;
@@ -178,10 +179,6 @@ public class VerificationService extends ServiceBase {
         return Optional.ofNullable(comparisonToCluster.get(comparison));
     }
 
-    public Predicate<Comparison> isNot(Status status) {
-        return (comparison) -> comparisonToStatus.getOrDefault(comparison, Status.NOT_SEEN) != status;
-    }
-
     public ObservableList<Cluster> getClusters() {
         return clusters;
     }
@@ -340,5 +337,10 @@ public class VerificationService extends ServiceBase {
                 out.println(cluster.toText());
             }
         }
+    }
+
+    public Predicate<Comparison> withStatus(List<Status> expectedStatuses) {
+        return (comparison) ->
+                expectedStatuses.contains(getStatus(comparison));
     }
 }

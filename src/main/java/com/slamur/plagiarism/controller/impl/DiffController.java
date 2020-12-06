@@ -1,6 +1,8 @@
 package com.slamur.plagiarism.controller.impl;
 
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.ResourceBundle;
 
@@ -9,6 +11,7 @@ import com.slamur.plagiarism.model.verification.Comparison;
 import com.slamur.plagiarism.model.verification.Status;
 import com.slamur.plagiarism.service.Services;
 import com.slamur.plagiarism.utils.FxmlUtils;
+import com.slamur.plagiarism.utils.ModelUtils;
 import com.slamur.plagiarism.utils.StreamUtils;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -18,7 +21,10 @@ import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextArea;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 public class DiffController extends TabController {
@@ -26,6 +32,14 @@ public class DiffController extends TabController {
     @FXML public VBox comparisonsVBox;
 
     @FXML public ListView<Comparison> comparisonsListView;
+
+    @FXML public HBox problemFiltersHBox;
+
+    @FXML public HBox statusFiltersHBox;
+
+    @FXML public Spinner<Double> minSimilaritySpinner;
+
+    @FXML public Button filterComparisonsButton;
 
     @FXML public TextArea leftParticipantInfoTextArea;
 
@@ -59,6 +73,9 @@ public class DiffController extends TabController {
 
     private int comparisonIndex;
     private Comparison comparison;
+
+    private CheckBox[] problemFilters;
+    private EnumMap<Status, CheckBox> statusFilters;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -109,8 +126,45 @@ public class DiffController extends TabController {
     }
 
     private void initializeComparisonInfoPart() {
+        initializeComparisonsFiltersPart();
         initializeComparisonsListView();
         initializeComparisonInfoLabel();
+    }
+
+    private void initializeComparisonsFiltersPart() {
+        var contest = Services.contest();
+
+        this.problemFilters = new CheckBox[contest.getProblemsCount()];
+        for (int problem = 0; problem < problemFilters.length; ++problem) {
+            var problemFilter = new CheckBox(ModelUtils.getProblemName(problem));
+            problemFilters[problem] = problemFilter;
+
+            problemFiltersHBox.getChildren().add(problemFilter);
+        }
+
+        this.statusFilters = new EnumMap<>(Status.class);
+        for (Status status : Status.values()) {
+            var statusFilter = new CheckBox(status.text);
+            statusFilters.put(status, statusFilter);
+
+            statusFiltersHBox.getChildren().add(statusFilter);
+        }
+
+        minSimilaritySpinner.setValueFactory(
+                new SpinnerValueFactory.DoubleSpinnerValueFactory(
+                        0, 1, 0.9, 0.05
+                )
+        );
+
+        filterComparisonsButton.setOnAction(actionEvent -> updateComparisonsListView());
+
+        for (CheckBox problemFilter : problemFilters) {
+            problemFilter.setSelected(true);
+        }
+
+        for (Status status : new Status[] { Status.NOT_SEEN }) {
+            statusFilters.get(status).setSelected(true);
+        }
     }
 
     private void initializeComparisonsListView() {
@@ -133,11 +187,30 @@ public class DiffController extends TabController {
     }
 
     private void updateComparisonsListView() {
+        double minSimilarity = minSimilaritySpinner.getValue();
+
+        List<Integer> expectedProblems = new ArrayList<>();
+        for (int problem = 0; problem < problemFilters.length; ++problem) {
+            if (problemFilters[problem].isSelected()) {
+                expectedProblems.add(problem);
+            }
+        }
+
+        List<Status> expectedStatuses = new ArrayList<>();
+        for (var statusEntry : statusFilters.entrySet()) {
+            if (statusEntry.getValue().isSelected()) {
+                expectedStatuses.add(statusEntry.getKey());
+            }
+        }
+
+        var comparisons = Services.comparisons();
+
         comparisonsListView.setItems(
-                Services.comparisons().getComparisons(
+                comparisons.filtered(
                         StreamUtils.and(
-                                Services.comparisons().moreThan(0.9),
-                                Services.verification().isNot(Status.IGNORED)
+                                comparisons.moreThan(minSimilarity),
+                                comparisons.forProblem(expectedProblems),
+                                Services.verification().withStatus(expectedStatuses)
                         )
                 )
         );
