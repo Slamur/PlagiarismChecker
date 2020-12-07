@@ -252,6 +252,7 @@ public class Cluster {
         }
 
         for (var clique : dividedCliques) {
+            cliques.remove(clique);
             dividedCluster.addClique(clique);
         }
 

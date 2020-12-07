@@ -2,6 +2,8 @@ package com.slamur.plagiarism.controller.impl;
 
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Optional;
@@ -85,6 +87,10 @@ public class DiffController extends TabController {
     @FXML public Button prevComparisonButton;
 
     @FXML public Button nextComparisonButton;
+
+    @FXML public Button showAllComparisonsForAuthorsButton;
+
+    @FXML public TextArea clusterCommentsTextArea;
 
     private int comparisonIndex;
     private Comparison comparison;
@@ -298,8 +304,12 @@ public class DiffController extends TabController {
                 clusterFilter
         );
 
+        updateComparisonsListView(predicate);
+    }
+
+    private void updateComparisonsListView(Predicate<Comparison> predicate) {
         comparisonsListView.setItems(
-                comparisons.filtered(predicate)
+                Services.comparisons().filtered(predicate)
         );
     }
 
@@ -325,8 +335,12 @@ public class DiffController extends TabController {
     private void showSelectedComparison() {
         if (null == comparison) return;
 
-        var cluster = Services.verification().getCluster(comparison);
-        goToClusterButton.setDisable(cluster.isEmpty());
+        var clusterOptional = Services.verification().getCluster(comparison);
+        goToClusterButton.setDisable(clusterOptional.isEmpty());
+
+        clusterOptional.ifPresent(cluster -> {
+            clusterCommentsTextArea.setText(cluster.commentsToText(false));
+        });
 
         comparisonInfoLabel.setText(comparison.getProblemName());
 
@@ -408,6 +422,17 @@ public class DiffController extends TabController {
         initializeVerdictButtons();
         initializeStatusPart();
         initializeClusterPart();
+        initializeAllForAuthorsPart();
+    }
+
+    private void initializeAllForAuthorsPart() {
+        showAllComparisonsForAuthorsButton.setOnAction(event -> {
+            if (null == comparison) return;
+
+            Predicate<Comparison> predicate = Services.comparisons().withAuthorsOf(comparison);
+
+            updateComparisonsListView(predicate);
+        });
     }
 
     private void initializeStatusPart() {

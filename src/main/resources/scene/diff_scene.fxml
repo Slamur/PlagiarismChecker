@@ -5,7 +5,7 @@
 
 <GridPane alignment="center" hgap="10" vgap="10" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.slamur.plagiarism.controller.impl.DiffController">
 
-    <VBox fx:id="comparisonsVBox" spacing="20.0" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.rowSpan="5">
+    <VBox fx:id="comparisonsVBox" spacing="20.0" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.rowSpan="6">
         <ListView fx:id="comparisonsListView"/>
 
         <HBox fx:id="problemFiltersHBox" spacing="20.0"/>
@@ -41,9 +41,14 @@
 
     <Label fx:id="comparisonStatusLabel" GridPane.columnIndex="2" GridPane.rowIndex="2" />
 
-    <Button fx:id="goToClusterButton" text="Перейти к кластеру" GridPane.columnIndex="2" GridPane.rowIndex="3" />
+    <VBox GridPane.columnIndex="2" GridPane.rowIndex="3" spacing="20.0">
+        <Button fx:id="goToClusterButton" text="Перейти к кластеру" />
+        <Button fx:id="showAllComparisonsForAuthorsButton" text="Все сравнения данных авторов" />
+    </VBox>
 
-    <HBox alignment="CENTER_LEFT" spacing="50.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
+    <TextArea fx:id="clusterCommentsTextArea" GridPane.columnIndex="1" GridPane.rowIndex="4" GridPane.columnSpan="3"/>
+
+    <HBox alignment="CENTER_LEFT" spacing="50.0" GridPane.columnIndex="1" GridPane.rowIndex="5">
         <CheckBox fx:id="blindModeCheckBox" text="Слепой режим" />
 
         <Button fx:id="prevComparisonButton" text="Предыдущее сравнение" />
@@ -51,7 +56,7 @@
         <Button fx:id="nextComparisonButton" text="Следующее сравнение" />
     </HBox>
 
-    <HBox alignment="CENTER_RIGHT" spacing="50.0" GridPane.columnIndex="3" GridPane.rowIndex="4">
+    <HBox alignment="CENTER_RIGHT" spacing="50.0" GridPane.columnIndex="3" GridPane.rowIndex="5">
         <Button fx:id="ignoreButton" text="Не списано" />
 
         <Button fx:id="unknownButton" text="Непонятно" />

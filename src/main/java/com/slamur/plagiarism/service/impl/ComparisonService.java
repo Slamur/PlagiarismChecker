@@ -198,5 +198,10 @@ public class ComparisonService extends ServiceBase {
         return (comparison) ->
                 expectedProblems.contains(comparison.problemId);
     }
+
+    public Predicate<Comparison> withAuthorsOf(Comparison source) {
+        return (comparison) ->
+                source.left == comparison.left && source.right == comparison.right;
+    }
 }
 

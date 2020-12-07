@@ -334,7 +334,7 @@ public class VerificationService extends ServiceBase {
 
                     Cluster cluster = getCluster(participant, problemId);
                     if (null == cluster) {
-                        cluster = createCluster(participant, problemId);
+                        cluster = getCluster(participant, problemId);
                     }
 
                     int commentsCount = Integer.parseInt(in.readLine());
@@ -355,7 +355,9 @@ public class VerificationService extends ServiceBase {
                         String author = commentLine.substring(0, authorDotsIndex);
                         String comment = commentLine.substring(authorDotsIndex + 1).trim();
 
-                        cluster.setComment(author, comment);
+                        if (null != cluster) {
+                            cluster.setComment(author, comment);
+                        }
                     }
 
                     in.readLine();
@@ -369,9 +371,9 @@ public class VerificationService extends ServiceBase {
     public void saveReportToFile() throws IOException {
         File reportFile = new File(Services.contest().getFolder(), "report.txt");
         try (PrintWriter out = new PrintWriter(reportFile, IOUtils.RUSSIAN_ENCODING)) {
-            for (Cluster cluster : clusters) {
-                out.println(cluster.toText());
-            }
+            clusters.stream()
+                    .filter(cluster -> cluster.size() > 1)
+                    .forEach(cluster -> out.println(cluster.toText()));
         }
     }
 
