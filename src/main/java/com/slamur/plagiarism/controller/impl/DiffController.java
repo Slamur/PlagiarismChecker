@@ -2,8 +2,6 @@ package com.slamur.plagiarism.controller.impl;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.EnumMap;
 import java.util.List;
 import java.util.Optional;
@@ -51,6 +49,10 @@ public class DiffController extends TabController {
     @FXML public HBox statusFiltersHBox;
 
     @FXML public Spinner<Double> minSimilaritySpinner;
+
+    @FXML public CheckBox useParticipantFilterCheckBox;
+
+    @FXML public Spinner<Integer> participantIdFilterSpinner;
 
     @FXML public CheckBox useClusterFilterCheckBox;
 
@@ -171,9 +173,17 @@ public class DiffController extends TabController {
             statusFiltersHBox.getChildren().add(statusFilter);
         }
 
+        minSimilaritySpinner.setEditable(true);
         minSimilaritySpinner.setValueFactory(
                 new SpinnerValueFactory.DoubleSpinnerValueFactory(
                         0, 1, 0.9, 0.05
+                )
+        );
+
+        participantIdFilterSpinner.setEditable(true);
+        participantIdFilterSpinner.setValueFactory(
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(
+                        0, 10000
                 )
         );
 
@@ -297,11 +307,16 @@ public class DiffController extends TabController {
                 )
                 : (comparison) -> true;
 
+        Predicate<Comparison> participantFilter = useParticipantFilterCheckBox.isSelected()
+                ? comparisons.withParticipant(participantIdFilterSpinner.getValue())
+                : (comparison) -> true;
+
         var predicate = StreamUtils.and(
                 comparisons.moreThan(minSimilarity),
                 comparisons.forProblem(expectedProblems),
                 verification.withStatus(expectedStatuses),
-                clusterFilter
+                clusterFilter,
+                participantFilter
         );
 
         updateComparisonsListView(predicate);

@@ -203,5 +203,10 @@ public class ComparisonService extends ServiceBase {
         return (comparison) ->
                 source.left == comparison.left && source.right == comparison.right;
     }
+
+    public Predicate<Comparison> withParticipant(int participantId) {
+        return (comparison) ->
+                comparison.left.id == participantId || comparison.right.id == participantId;
+    }
 }
 
