@@ -192,7 +192,7 @@ public class ContestService extends ServiceBase {
         List<Element> participantLinks = monitor.getElementsByAttributeValueContaining("href", "viewprofile/" + contest.getType());
 
         return participantLinks.stream()
-                .map(participantLinkElement -> participantLinkElement.attr("href"))
+                .map(participantLinkElement -> participantLinkElement.attr("href") + "all")
                 .collect(Collectors.toList());
     }
 
@@ -255,6 +255,8 @@ public class ContestService extends ServiceBase {
     ) throws IOException {
         List<Element> submits = participantPage.getElementsByTag("tr");
 
+        Collections.reverse(submits);
+
         for (Element submitElement : submits) {
             processSubmit(contest, participant, submitElement, requestProcessor);
         }
@@ -272,6 +274,45 @@ public class ContestService extends ServiceBase {
         String submitPlain = requestProcessor.get(submitLink);
         Document submitPage = Jsoup.parse(submitPlain);
 
+        // parsing problem id
+        Element problemNameElement = submitElement.getElementsByAttributeValueContaining("href", "problemset").first();
+
+        String problemName = problemNameElement.text();
+        if (problemName.length() != 1) return;
+
+        int problemIndex = problemName.charAt(0) - 'A';
+        if (problemIndex < 0 || contest.getProblemsCount() <= problemIndex) return;
+
+        // parsing verdict
+        Element samplesVerdictElement = submitPage.getElementsByAttributeValueContaining("href", "resultshelp").first();
+        String samplesVerdictText = samplesVerdictElement.text();
+
+        Verdict verdict = Verdict.fromText(samplesVerdictText);
+
+        int score = 0;
+        if (verdict == Verdict.CE || verdict == Verdict.UNKNOWN) {
+            score = 0;
+        } else {
+            // parsing score
+            final String scoreSuffix = "баллов";
+            Element realResultElement = submitPage.getElementsContainingOwnText(scoreSuffix).first();
+
+            if (null != realResultElement) {
+                String realResultText = realResultElement.ownText();
+
+                int scoreSuffixIndex = realResultText.indexOf(scoreSuffix);
+
+                String scorePrefixText = realResultText.substring(0, scoreSuffixIndex).trim();
+
+                int lastSpaceIndex = scorePrefixText.lastIndexOf(" ");
+
+                String scoreText = scorePrefixText.substring(lastSpaceIndex).trim();
+                scoreText = scoreText.substring(0, scoreText.indexOf("."));
+                score = Integer.parseInt(scoreText);
+            }
+        }
+
+        // parsing time
         Element timeElement = submitPage.getElementsContainingOwnText("Отправлено").first();
         if (timeElement == null) return;
 
@@ -285,50 +326,29 @@ public class ContestService extends ServiceBase {
                 dateTimeText, Solution.DATE_TIME_FORMATTER
         );
 
-        if (dateTime.compareTo(contest.getEndDateTime()) >= 0) {
-            return;
-        }
-
         if (dateTime.compareTo(contest.getStartDateTime()) < 0) {
             return;
         }
 
-        Element problemNameElement = submitElement.getElementsByAttributeValueContaining("href", "problemset").first();
-
-        String problemName = problemNameElement.text();
-        if (problemName.length() != 1) return;
-
-        int problemIndex = problemName.charAt(0) - 'A';
-
-        Element samplesVerdictElement = submitPage.getElementsByAttributeValueContaining("href", "resultshelp").first();
-        String samplesVerdictText = samplesVerdictElement.text();
-
-        Verdict verdict = Verdict.fromText(samplesVerdictText);
-        if (verdict == Verdict.CE || verdict == Verdict.UNKNOWN) return;
-
-        final String scoreSuffix = "баллов";
-        Element realResultElement = submitPage.getElementsContainingOwnText(scoreSuffix).first();
-
-        int score = 0;
-        if (null != realResultElement) {
-            String realResultText = realResultElement.ownText();
-
-            int scoreSuffixIndex = realResultText.indexOf(scoreSuffix);
-
-            String scorePrefixText = realResultText.substring(0, scoreSuffixIndex).trim();
-
-            int lastSpaceIndex = scorePrefixText.lastIndexOf(" ");
-
-            String scoreText = scorePrefixText.substring(lastSpaceIndex).trim();
-            scoreText = scoreText.substring(0, scoreText.indexOf("."));
-            score = Integer.parseInt(scoreText);
-        }
-
+        // compare with old
         Solution oldSolution = participant.solutions[problemIndex];
 
         boolean needUpdate = (null == oldSolution)
                 || oldSolution.score < score
                 || oldSolution.score == score && oldSolution.dateTime.compareTo(dateTime) > 0;
+
+        if (dateTime.compareTo(contest.getEndDateTime()) >= 0) {
+            if (score > 0 && needUpdate && dateTime.compareTo(contest.getEndDateTime().plusMinutes(15)) <= 0) {
+                String oldSolutionString = (null == oldSolution ? "no old" : oldSolution.getDateTimeString() + "\t" +
+                        oldSolution.verdict + "\t" + oldSolution.score);
+
+                String newSolutionString = dateTime.format(Solution.DATE_TIME_FORMATTER) + "\t" + verdict + "\t" + score;
+
+                System.out.println(participant.getFullLink() + "\t" + problemName + "\t" + oldSolutionString + "\t" + newSolutionString);
+            }
+
+            return;
+        }
 
         if (needUpdate) {
             Element codeElement = submitPage.getElementsByTag("code").first();

@@ -9,6 +9,8 @@ import java.util.ResourceBundle;
 import java.util.function.Predicate;
 
 import com.slamur.plagiarism.model.parsing.Participant;
+import com.slamur.plagiarism.model.parsing.Solution;
+import com.slamur.plagiarism.model.parsing.Verdict;
 import com.slamur.plagiarism.model.verification.Cluster;
 import com.slamur.plagiarism.model.verification.Comparison;
 import com.slamur.plagiarism.model.verification.Status;
@@ -311,12 +313,20 @@ public class DiffController extends TabController {
                 ? comparisons.withParticipant(participantIdFilterSpinner.getValue())
                 : (comparison) -> true;
 
+        Predicate<Comparison> atLeastOneAcFilter = (comparison) -> {
+            int problemId = comparison.problemId;
+            Solution left = comparison.left.solutions[problemId];
+            Solution right = comparison.right.solutions[problemId];
+            return Verdict.AC == left.verdict || Verdict.AC == right.verdict;
+        };
+
         var predicate = StreamUtils.and(
                 comparisons.moreThan(minSimilarity),
                 comparisons.forProblem(expectedProblems),
                 verification.withStatus(expectedStatuses),
                 clusterFilter,
-                participantFilter
+                participantFilter,
+                atLeastOneAcFilter
         );
 
         updateComparisonsListView(predicate);

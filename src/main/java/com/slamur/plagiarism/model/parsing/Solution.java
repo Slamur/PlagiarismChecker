@@ -24,6 +24,10 @@ public class Solution {
 
         List<SolutionRow> leftRows = leftSolution.rows;
         List<SolutionRow> rightRows = rightSolution.rows;
+
+        if (leftRows.isEmpty() || rightRows.isEmpty()) {
+            return 0;
+        }
         
         int leftSize = leftRows.size();
         int rightSize = rightRows.size();
