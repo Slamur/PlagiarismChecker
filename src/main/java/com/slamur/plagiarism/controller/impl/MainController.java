@@ -125,7 +125,7 @@ public class MainController implements Controller {
         try {
             Services.verification().saveReportToFile();
             AlertUtils.information(
-                    "Проткоол сохранён"
+                    "Протокол сохранён"
             );
         } catch (Exception e) {
             AlertUtils.error(
