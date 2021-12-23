@@ -26,7 +26,7 @@ public class Participant {
     public final String link;
     public final String id;
     public final String login;
-    public final Solution[] solutions;
+    public final Solution[] problemToBestSolution;
     public final List<Solution> allSolutions;
 
     private Participant(String link, int problemsCount) {
@@ -36,7 +36,7 @@ public class Participant {
         this.login = linkWithoutAll.substring(linkWithoutAll.lastIndexOf("/") + 1);
         this.id = login.substring(login.indexOf("_") + 1);
 
-        this.solutions = new Solution[problemsCount];
+        this.problemToBestSolution = new Solution[problemsCount];
         this.allSolutions = new ArrayList<>();
     }
 
@@ -44,7 +44,7 @@ public class Participant {
         allSolutions.add(solution);
 
         // compare with old
-        Solution oldSolution = solutions[problemIndex];
+        Solution oldSolution = problemToBestSolution[problemIndex];
 
         boolean needUpdate = (null == oldSolution)
                 || oldSolution.score < solution.score
@@ -52,7 +52,7 @@ public class Participant {
                     && oldSolution.dateTime.compareTo(solution.dateTime) > 0;
 
         if (needUpdate) {
-            solutions[problemIndex] = solution;
+            problemToBestSolution[problemIndex] = solution;
         }
     }
 

@@ -42,7 +42,7 @@ public class Clique {
         for (Participant participant : participants) {
             builder.append(participant.login)
                     .append("\t")
-                    .append(participant.solutions[problemId])
+                    .append(participant.problemToBestSolution[problemId])
                     .append("\n");
         }
 

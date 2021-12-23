@@ -138,8 +138,8 @@ public class ComparisonService extends ServiceBase {
     }
 
     public Comparison compare(Participant left, Participant right, int problemIndex) {
-        var leftSolution = left.solutions[problemIndex];
-        var rightSolution = right.solutions[problemIndex];
+        var leftSolution = left.problemToBestSolution[problemIndex];
+        var rightSolution = right.problemToBestSolution[problemIndex];
 
         if (null == leftSolution || null == rightSolution) {
             return null;

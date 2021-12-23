@@ -368,7 +368,7 @@ public class ContestService extends ServiceBase {
 
     private static void saveSolutionsToFile(File file, Participant participant) throws FileNotFoundException {
         try (PrintWriter out = new PrintWriter(file)) {
-            for (Solution solution : participant.solutions) {
+            for (Solution solution : participant.problemToBestSolution) {
                 out.println(solution == null ? null : solution.toText());
             }
         }
@@ -376,7 +376,7 @@ public class ContestService extends ServiceBase {
 
     private static void loadSolutionsFromFile(File file, Participant participant) throws IOException {
         try (BufferedReader in = new BufferedReader(new FileReader(file))) {
-            for (int problemIndex = 0; problemIndex < participant.solutions.length; ++problemIndex) {
+            for (int problemIndex = 0; problemIndex < participant.problemToBestSolution.length; ++problemIndex) {
                 String link = in.readLine();
                 if ("null".equals(link)) continue;
 
@@ -396,7 +396,7 @@ public class ContestService extends ServiceBase {
 
                 in.readLine();
 
-                participant.solutions[problemIndex] =
+                participant.problemToBestSolution[problemIndex] =
                         new Solution(link, codeBuilder.toString(), verdict, score, dateTime);
             }
         }

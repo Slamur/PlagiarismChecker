@@ -311,8 +311,8 @@ public class DiffController extends TabController {
 
         Predicate<Comparison> atLeastOneAcFilter = (comparison) -> {
             int problemId = comparison.problemId;
-            Solution left = comparison.left.solutions[problemId];
-            Solution right = comparison.right.solutions[problemId];
+            Solution left = comparison.left.problemToBestSolution[problemId];
+            Solution right = comparison.right.problemToBestSolution[problemId];
             return Verdict.AC == left.verdict || Verdict.AC == right.verdict;
         };
 
@@ -385,7 +385,7 @@ public class DiffController extends TabController {
                                          Label codeInfoLabel,
                                          TextArea participantInfoTextArea,
                                          TextArea codeTextArea) {
-        var solution = participant.solutions[problemId];
+        var solution = participant.problemToBestSolution[problemId];
 
         participantInfoTextArea.setText(
                 Services.contest().getInfo(participant) + "\n"
