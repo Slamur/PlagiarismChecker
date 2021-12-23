@@ -191,7 +191,6 @@ public class SolutionRow {
             int thisCount = wordCounts.getOrDefault(entry.getKey(), 0);
 
             if (thisCount == 0) {
-                both += 0;
                 total += otherCount;
             }
         }

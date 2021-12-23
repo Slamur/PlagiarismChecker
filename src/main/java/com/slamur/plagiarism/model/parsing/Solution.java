@@ -14,14 +14,6 @@ public class Solution {
     public static final DateTimeFormatter DATE_TIME_FORMATTER = DateTimeFormatter.ofPattern(DATE_TIME_PATTERN);
 
     public static double calculateSimilarity(Solution leftSolution, Solution rightSolution, double filter) {
-        if (null == leftSolution.rows) {
-            leftSolution.build();
-        }
-
-        if (null == rightSolution.rows) {
-            rightSolution.build();
-        }
-
         List<SolutionRow> leftRows = leftSolution.rows;
         List<SolutionRow> rightRows = rightSolution.rows;
 
@@ -48,7 +40,7 @@ public class Solution {
     public final int score;
     public final LocalDateTime dateTime;
 
-    private List<SolutionRow> rows;
+    private final List<SolutionRow> rows;
 
     public Solution(String link, String code, Verdict verdict, int score, LocalDateTime dateTime) {
         this.link = link;
@@ -56,9 +48,7 @@ public class Solution {
         this.verdict = verdict;
         this.score = score;
         this.dateTime = dateTime;
-    }
 
-    public void build() {
         this.rows = new ArrayList<>();
         for (var line : code.split("\n")) {
             if (!line.trim().isEmpty()) {
