@@ -19,7 +19,7 @@
 
         <HBox spacing="10.0">
             <CheckBox fx:id="useParticipantFilterCheckBox" text="Использовать фильтр по ID"/>
-            <Spinner fx:id="participantIdFilterSpinner"/>
+            <TextField fx:id="participantIdFilterTextField"/>
         </HBox>
 
         <HBox spacing="10.0">

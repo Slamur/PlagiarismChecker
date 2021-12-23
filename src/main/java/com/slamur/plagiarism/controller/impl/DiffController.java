@@ -30,6 +30,7 @@ import javafx.scene.control.SelectionMode;
 import javafx.scene.control.Spinner;
 import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.control.cell.TextFieldListCell;
 import javafx.scene.layout.Border;
 import javafx.scene.layout.BorderStroke;
@@ -54,7 +55,7 @@ public class DiffController extends TabController {
 
     @FXML public CheckBox useParticipantFilterCheckBox;
 
-    @FXML public Spinner<Integer> participantIdFilterSpinner;
+    @FXML public TextField participantIdFilterTextField;
 
     @FXML public CheckBox useClusterFilterCheckBox;
 
@@ -182,12 +183,7 @@ public class DiffController extends TabController {
                 )
         );
 
-        participantIdFilterSpinner.setEditable(true);
-        participantIdFilterSpinner.setValueFactory(
-                new SpinnerValueFactory.IntegerSpinnerValueFactory(
-                        0, 10000
-                )
-        );
+        participantIdFilterTextField.setEditable(true);
 
         clusterFiltersListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
@@ -310,7 +306,7 @@ public class DiffController extends TabController {
                 : (comparison) -> true;
 
         Predicate<Comparison> participantFilter = useParticipantFilterCheckBox.isSelected()
-                ? comparisons.withParticipant(participantIdFilterSpinner.getValue())
+                ? comparisons.withParticipant(participantIdFilterTextField.getText())
                 : (comparison) -> true;
 
         Predicate<Comparison> atLeastOneAcFilter = (comparison) -> {
@@ -363,9 +359,7 @@ public class DiffController extends TabController {
         var clusterOptional = Services.verification().getCluster(comparison);
         goToClusterButton.setDisable(clusterOptional.isEmpty());
 
-        clusterOptional.ifPresent(cluster -> {
-            clusterCommentsTextArea.setText(cluster.commentsToText(false));
-        });
+        clusterOptional.ifPresent(cluster -> clusterCommentsTextArea.setText(cluster.commentsToText(false)));
 
         comparisonInfoLabel.setText(comparison.getProblemName());
 

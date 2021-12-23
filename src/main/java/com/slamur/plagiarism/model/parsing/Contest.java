@@ -21,7 +21,7 @@ public class Contest {
         }
     }
 
-    public static final String SCHOOL = "sch", CITY = "okrug";
+    public static final String SCHOOL = "sch", CITY = "okrug", REGION = "vseros";
 
     private final String type;
     private final int id;

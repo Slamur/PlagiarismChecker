@@ -46,12 +46,36 @@ public class ContestService extends ServiceBase {
             5
     );
 
+    public static final Contest REGION_2020_1 = new Contest(
+            Contest.REGION, 581,
+            LocalDate.of(2021, 1, 16),
+            LocalTime.of(10, 35),
+            LocalTime.of(15, 45),
+            4
+    );
+
+    public static final Contest REGION_2020_2 = new Contest(
+            Contest.REGION, 583,
+            LocalDate.of(2021, 1, 18),
+            LocalTime.of(10, 0),
+            LocalTime.of(15, 6),
+            8
+    );
+
+    public static final Contest OKRUG_2021 = new Contest(
+            Contest.CITY, 588,
+            LocalDate.of(2021, 11, 27),
+            LocalTime.of(10, 0),
+            LocalTime.of(14, 0),
+            5
+    );
+
     private final Contest contest;
     private final List<Participant> participants;
     private final Map<Participant, ParticipantInfo> infoByParticipant;
 
     public ContestService() {
-        this.contest = OKRUG_2020;
+        this.contest = OKRUG_2021;
         this.participants = new ArrayList<>();
         this.infoByParticipant = new HashMap<>();
     }
@@ -60,7 +84,7 @@ public class ContestService extends ServiceBase {
     protected void initializeOnly() {
         try {
             loadParticipants();
-        } catch (IOException e) {
+        } catch (Exception e) {
             AlertUtils.error("Не удалось загрузить участников с их решениями", e);
         }
     }
@@ -269,6 +293,8 @@ public class ContestService extends ServiceBase {
         if (submitElement.getElementsByTag("th").size() > 0) return;
 
         Element submitLinkElement = submitElement.getElementsByAttributeValueContaining("href", "solution").first();
+        if (null == submitLinkElement) return;
+
         String submitLink = submitLinkElement.attr("href");
 
         String submitPlain = requestProcessor.get(submitLink);
@@ -278,7 +304,7 @@ public class ContestService extends ServiceBase {
         Element problemNameElement = submitElement.getElementsByAttributeValueContaining("href", "problemset").first();
 
         String problemName = problemNameElement.text();
-        if (problemName.length() != 1) return;
+        if (!problemName.matches("[A-Z].*")) return;
 
         int problemIndex = problemName.charAt(0) - 'A';
         if (problemIndex < 0 || contest.getProblemsCount() <= problemIndex) return;
@@ -290,9 +316,7 @@ public class ContestService extends ServiceBase {
         Verdict verdict = Verdict.fromText(samplesVerdictText);
 
         int score = 0;
-        if (verdict == Verdict.CE || verdict == Verdict.UNKNOWN) {
-            score = 0;
-        } else {
+        if (verdict != Verdict.CE && verdict != Verdict.UNKNOWN) {
             // parsing score
             final String scoreSuffix = "баллов";
             Element realResultElement = submitPage.getElementsContainingOwnText(scoreSuffix).first();
@@ -330,25 +354,16 @@ public class ContestService extends ServiceBase {
             return;
         }
 
+        if (dateTime.compareTo(contest.getEndDateTime()) >= 0) {
+            return;
+        }
+
         // compare with old
         Solution oldSolution = participant.solutions[problemIndex];
 
         boolean needUpdate = (null == oldSolution)
                 || oldSolution.score < score
                 || oldSolution.score == score && oldSolution.dateTime.compareTo(dateTime) > 0;
-
-        if (dateTime.compareTo(contest.getEndDateTime()) >= 0) {
-            if (score > 0 && needUpdate && dateTime.compareTo(contest.getEndDateTime().plusMinutes(15)) <= 0) {
-                String oldSolutionString = (null == oldSolution ? "no old" : oldSolution.getDateTimeString() + "\t" +
-                        oldSolution.verdict + "\t" + oldSolution.score);
-
-                String newSolutionString = dateTime.format(Solution.DATE_TIME_FORMATTER) + "\t" + verdict + "\t" + score;
-
-                System.out.println(participant.getFullLink() + "\t" + problemName + "\t" + oldSolutionString + "\t" + newSolutionString);
-            }
-
-            return;
-        }
 
         if (needUpdate) {
             Element codeElement = submitPage.getElementsByTag("code").first();

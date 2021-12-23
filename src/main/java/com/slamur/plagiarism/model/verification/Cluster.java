@@ -134,10 +134,10 @@ public class Cluster {
 
     @Override
     public String toString() {
-        int minParticipantId = getParticipants().stream()
-                .mapToInt(participant -> participant.id)
-                .min()
-                .orElse(-1);
+        String minParticipantId = getParticipants().stream()
+                .map(participant -> participant.id)
+                .min(String::compareTo)
+                .orElse("-1");
 
         return minParticipantId + " " + ModelUtils.getProblemName(problemId);
     }

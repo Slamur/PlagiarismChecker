@@ -255,7 +255,7 @@ public class VerificationService extends ServiceBase {
 
     public void loadPatchFrom(File file) throws IOException {
         int problemsCount = Services.contest().getProblemsCount();
-        Map<Integer, Participant> idToParticipant = new HashMap<>();
+        Map<String, Participant> idToParticipant = new HashMap<>();
 
         Services.contest().getParticipants()
                 .forEach(p -> idToParticipant.put(p.id, p));
@@ -271,8 +271,8 @@ public class VerificationService extends ServiceBase {
                 try {
                     var tok = new StringTokenizer(line, "-() \t");
 
-                    int leftId = Integer.parseInt(tok.nextToken());
-                    int rightId = Integer.parseInt(tok.nextToken());
+                    String leftId = tok.nextToken();
+                    String rightId = tok.nextToken();
                     int problemId = tok.nextToken().charAt(0) - 'A';
                     Status status = Status.valueOf(tok.nextToken());
 
@@ -287,7 +287,7 @@ public class VerificationService extends ServiceBase {
                         throw new IOException("Сравнение содержит неверный идентификатор правого участника: " + line);
                     }
 
-                    if (leftId == rightId) {
+                    if (leftId.equals(rightId)) {
                         throw new IOException("Сравнение участника с самим собой: " + line);
                     }
 
@@ -320,7 +320,7 @@ public class VerificationService extends ServiceBase {
                     String clusterInfoLine = in.readLine();
                     String[] clusterInfoParts = clusterInfoLine.split(" ");
 
-                    int participantId = Integer.parseInt(clusterInfoParts[0]);
+                    String participantId = clusterInfoParts[0];
                     int problemId = clusterInfoParts[1].charAt(0) - 'A';
 
                     Participant participant = idToParticipant.get(participantId);

@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -29,7 +30,9 @@ import javafx.collections.ObservableList;
 
 public class ComparisonService extends ServiceBase {
 
-    private static final boolean waScan = false;
+    private static final EnumSet<Verdict> notScanningVerdicts = EnumSet.of(Verdict.WA, Verdict.CE);
+    private static final boolean onlyEqualScoreScan = true;
+
     private static final double solutionSimilarityFilter = 0.9;
 
     private static final String comparisonsFileName = "comparisons";
@@ -67,22 +70,22 @@ public class ComparisonService extends ServiceBase {
 
     private void loadComparisons(List<Participant> participants) {
         try (BufferedReader in = new BufferedReader(new FileReader(comparisonsFile))){
-            Participant[] participantsById = new Participant[10000];
+            Map<String, Participant> participantsById = new HashMap<>();
             for (Participant participant : participants) {
-                participantsById[participant.id] = participant;
+                participantsById.put(participant.id, participant);
             }
 
             in.lines().forEach(line -> {
                 StringTokenizer tok = new StringTokenizer(line, " -()");
 
-                int leftId = Integer.parseInt(tok.nextToken());
-                int rightId = Integer.parseInt(tok.nextToken());
+                String leftId = tok.nextToken();
+                String rightId = tok.nextToken();
                 int problemId = tok.nextToken().charAt(0) - 'A';
 
                 double similarity = Double.parseDouble(tok.nextToken());
 
-                var left = participantsById[leftId];
-                var right = participantsById[rightId];
+                var left = participantsById.get(leftId);
+                var right = participantsById.get(rightId);
 
                 if (null != left && null != right) {
                     var comparison = new Comparison(
@@ -142,14 +145,15 @@ public class ComparisonService extends ServiceBase {
             return null;
         }
 
-        if (!waScan) {
-            if (Verdict.WA == leftSolution.verdict || Verdict.WA == rightSolution.verdict) {
-                return null;
-            }
+        if (notScanningVerdicts.contains(leftSolution.verdict)
+                || notScanningVerdicts.contains(rightSolution.verdict)) {
+            return null;
         }
 
-        if (leftSolution.score != rightSolution.score) {
-            return null;
+        if (onlyEqualScoreScan) {
+            if (leftSolution.score != rightSolution.score) {
+                return null;
+            }
         }
 
         var comparison = new Comparison(left, right, problemIndex);
@@ -204,9 +208,9 @@ public class ComparisonService extends ServiceBase {
                 source.left == comparison.left && source.right == comparison.right;
     }
 
-    public Predicate<Comparison> withParticipant(int participantId) {
+    public Predicate<Comparison> withParticipant(String participantId) {
         return (comparison) ->
-                comparison.left.id == participantId || comparison.right.id == participantId;
+                comparison.left.id.equals(participantId) || comparison.right.id.equals(participantId);
     }
 }
 

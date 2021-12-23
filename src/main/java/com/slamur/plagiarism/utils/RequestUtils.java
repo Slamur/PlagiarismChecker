@@ -10,7 +10,7 @@ import java.util.Map;
 public class RequestUtils {
 
     public static final String GET = "GET", POST = "POST";
-    public static final String DOMAIN = "http://contest.uni-smr.ac.ru";
+    public static final String DOMAIN = "http://contest.samsu.ru";
 
     public static String get(String url, Map<String, String> parameters, Map<String, String> cookies) throws IOException {
         return request(GET, url, parameters, cookies);

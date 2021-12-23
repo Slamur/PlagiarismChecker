@@ -22,7 +22,7 @@ public class Participant {
     }
 
     public final String link;
-    public final int id;
+    public final String id;
     public final String login;
     public final Solution[] solutions;
 
@@ -31,7 +31,7 @@ public class Participant {
 
         String linkWithoutAll = link.substring(0, link.indexOf("/all"));
         this.login = linkWithoutAll.substring(linkWithoutAll.lastIndexOf("/") + 1);
-        this.id = Integer.parseInt(login.substring(login.indexOf("_") + 1));
+        this.id = login.substring(login.indexOf("_") + 1);
 
         this.solutions = new Solution[problemsCount];
     }
@@ -51,7 +51,7 @@ public class Participant {
         }
 
         Participant that = (Participant) o;
-        return id == that.id;
+        return id.equals(that.id);
     }
 
     @Override

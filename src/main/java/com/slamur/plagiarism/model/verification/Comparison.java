@@ -12,7 +12,7 @@ public class Comparison {
     public final int problemId;
 
     public Comparison(Participant left, Participant right, int problemId) {
-        if (left.id > right.id) {
+        if (left.id.compareTo(right.id) > 0) {
             Participant tmp = left;
             left = right;
             right = tmp;
