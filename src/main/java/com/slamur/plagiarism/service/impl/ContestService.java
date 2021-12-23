@@ -358,20 +358,12 @@ public class ContestService extends ServiceBase {
             return;
         }
 
-        // compare with old
-        Solution oldSolution = participant.solutions[problemIndex];
+        Element codeElement = submitPage.getElementsByTag("code").first();
 
-        boolean needUpdate = (null == oldSolution)
-                || oldSolution.score < score
-                || oldSolution.score == score && oldSolution.dateTime.compareTo(dateTime) > 0;
+        String code = Parser.unescapeEntities(codeElement.text(), true);
 
-        if (needUpdate) {
-            Element codeElement = submitPage.getElementsByTag("code").first();
-
-            String code = Parser.unescapeEntities(codeElement.text(), true);
-
-            participant.solutions[problemIndex] = new Solution(submitLink, code, verdict, score, dateTime);
-        }
+        Solution solution = new Solution(submitLink, code, verdict, score, dateTime);
+        participant.addSolution(solution, problemIndex);
     }
 
     private static void saveSolutionsToFile(File file, Participant participant) throws FileNotFoundException {

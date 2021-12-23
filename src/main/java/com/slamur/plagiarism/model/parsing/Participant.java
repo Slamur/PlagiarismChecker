@@ -1,5 +1,7 @@
 package com.slamur.plagiarism.model.parsing;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
 
 import com.slamur.plagiarism.utils.RequestUtils;
@@ -25,6 +27,7 @@ public class Participant {
     public final String id;
     public final String login;
     public final Solution[] solutions;
+    public final List<Solution> allSolutions;
 
     private Participant(String link, int problemsCount) {
         this.link = link;
@@ -34,6 +37,23 @@ public class Participant {
         this.id = login.substring(login.indexOf("_") + 1);
 
         this.solutions = new Solution[problemsCount];
+        this.allSolutions = new ArrayList<>();
+    }
+
+    public void addSolution(Solution solution, int problemIndex) {
+        allSolutions.add(solution);
+
+        // compare with old
+        Solution oldSolution = solutions[problemIndex];
+
+        boolean needUpdate = (null == oldSolution)
+                || oldSolution.score < solution.score
+                || oldSolution.score == solution.score
+                    && oldSolution.dateTime.compareTo(solution.dateTime) > 0;
+
+        if (needUpdate) {
+            solutions[problemIndex] = solution;
+        }
     }
 
     @Override
