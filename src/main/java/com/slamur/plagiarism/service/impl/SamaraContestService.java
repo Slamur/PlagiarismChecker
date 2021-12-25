@@ -36,7 +36,7 @@ import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.parser.Parser;
 
-public class ContestService extends ServiceBase {
+public class SamaraContestService extends ServiceBase {
 
     public static final Contest OKRUG_2020 = new Contest(
             Contest.CITY, 579,
@@ -74,7 +74,7 @@ public class ContestService extends ServiceBase {
     private final List<Participant> participants;
     private final Map<Participant, ParticipantInfo> infoByParticipant;
 
-    public ContestService() {
+    public SamaraContestService() {
         this.contest = OKRUG_2021;
         this.participants = new ArrayList<>();
         this.infoByParticipant = new HashMap<>();
@@ -174,7 +174,7 @@ public class ContestService extends ServiceBase {
         );
 
         for (String participantLink : totalParticipantLinks) {
-            Participant participant = Participant.createFromLink(participantLink, contest);
+            Participant participant = Participant.createSamaraParticipantFromLink(participantLink, contest);
 
             File participantFolder = new File(participantsFolder, participant.login);
             if (!participantFolder.exists()) {

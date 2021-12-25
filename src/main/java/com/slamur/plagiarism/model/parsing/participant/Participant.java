@@ -16,13 +16,18 @@ public class Participant {
         return PROFILE_PREFIX + login + "/all";
     }
 
-    public static Participant createFromLink(String link, Contest contest) {
+    public static Participant createSamaraParticipantFromLink(String link, Contest contest) {
         if (link.endsWith("/")) link = link.substring(0, link.length() - 1);
         if (link.contains("%20")) {
             link = link.replace("%20", "");
         }
 
-        return new Participant(link, contest.getProblemsCount());
+        String linkWithoutAll = link.substring(0, link.indexOf("/all"));
+        String login = linkWithoutAll.substring(linkWithoutAll.lastIndexOf("/") + 1);
+        String id = login.substring(login.indexOf("_") + 1);
+
+
+        return new Participant(link, id, login, contest.getProblemsCount());
     }
 
     // TODO separate participant and participant result (problemToBestSolutions)
@@ -33,13 +38,10 @@ public class Participant {
     public final Solution[] problemToBestSolution;
     public final List<Solution> allSolutions;
 
-    private Participant(String link, int problemsCount) {
+    public Participant(String link, String id, String login, int problemsCount) {
         this.link = link;
-
-        String linkWithoutAll = link.substring(0, link.indexOf("/all"));
-        this.login = linkWithoutAll.substring(linkWithoutAll.lastIndexOf("/") + 1);
-        this.id = login.substring(login.indexOf("_") + 1);
-
+        this.id = id;
+        this.login = login;
         this.problemToBestSolution = new Solution[problemsCount];
         this.allSolutions = new ArrayList<>();
     }
