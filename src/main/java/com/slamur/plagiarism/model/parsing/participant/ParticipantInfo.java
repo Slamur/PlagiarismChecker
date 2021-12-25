@@ -1,4 +1,4 @@
-package com.slamur.plagiarism.model.parsing;
+package com.slamur.plagiarism.model.parsing.participant;
 
 public class ParticipantInfo {
 

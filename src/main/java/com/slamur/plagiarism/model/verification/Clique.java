@@ -3,7 +3,7 @@ package com.slamur.plagiarism.model.verification;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.slamur.plagiarism.model.parsing.Participant;
+import com.slamur.plagiarism.model.parsing.participant.Participant;
 
 public class Clique {
 

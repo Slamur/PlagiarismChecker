@@ -2,7 +2,7 @@ package com.slamur.plagiarism.model.verification;
 
 import java.util.Objects;
 
-import com.slamur.plagiarism.model.parsing.Participant;
+import com.slamur.plagiarism.model.parsing.participant.Participant;
 import com.slamur.plagiarism.utils.ModelUtils;
 
 public class Comparison {

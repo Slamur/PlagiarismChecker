@@ -18,7 +18,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import com.slamur.plagiarism.model.parsing.Contest;
-import com.slamur.plagiarism.model.parsing.Participant;
+import com.slamur.plagiarism.model.parsing.participant.Participant;
 import com.slamur.plagiarism.model.parsing.Solution;
 import com.slamur.plagiarism.model.parsing.Verdict;
 import com.slamur.plagiarism.model.verification.Comparison;

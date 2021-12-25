@@ -22,8 +22,8 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 import com.slamur.plagiarism.model.parsing.Contest;
-import com.slamur.plagiarism.model.parsing.Participant;
-import com.slamur.plagiarism.model.parsing.ParticipantInfo;
+import com.slamur.plagiarism.model.parsing.participant.Participant;
+import com.slamur.plagiarism.model.parsing.participant.ParticipantInfo;
 import com.slamur.plagiarism.model.parsing.Solution;
 import com.slamur.plagiarism.model.parsing.Verdict;
 import com.slamur.plagiarism.service.Services;

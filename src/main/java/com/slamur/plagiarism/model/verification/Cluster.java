@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import com.slamur.plagiarism.model.parsing.Participant;
+import com.slamur.plagiarism.model.parsing.participant.Participant;
 import com.slamur.plagiarism.utils.ModelUtils;
 
 public class Cluster {

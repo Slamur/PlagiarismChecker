@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.StringTokenizer;
 import java.util.function.Predicate;
 
-import com.slamur.plagiarism.model.parsing.Participant;
+import com.slamur.plagiarism.model.parsing.participant.Participant;
 import com.slamur.plagiarism.model.verification.Cluster;
 import com.slamur.plagiarism.model.verification.Comparison;
 import com.slamur.plagiarism.model.verification.Status;
