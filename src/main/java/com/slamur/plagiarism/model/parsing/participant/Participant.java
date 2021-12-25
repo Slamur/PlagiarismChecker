@@ -5,7 +5,7 @@ import java.util.List;
 import java.util.Objects;
 
 import com.slamur.plagiarism.model.parsing.Contest;
-import com.slamur.plagiarism.model.parsing.Solution;
+import com.slamur.plagiarism.model.parsing.solution.Solution;
 import com.slamur.plagiarism.utils.RequestUtils;
 
 public class Participant {

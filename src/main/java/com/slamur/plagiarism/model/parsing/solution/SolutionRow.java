@@ -1,4 +1,4 @@
-package com.slamur.plagiarism.model.parsing;
+package com.slamur.plagiarism.model.parsing.solution;
 
 import java.util.ArrayList;
 import java.util.Arrays;
