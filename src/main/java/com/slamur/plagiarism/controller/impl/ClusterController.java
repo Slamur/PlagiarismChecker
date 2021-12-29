@@ -4,7 +4,7 @@ import java.net.URL;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
-import com.slamur.plagiarism.model.parsing.participant.Participant;
+import com.slamur.plagiarism.model.parsing.solution.Solution;
 import com.slamur.plagiarism.model.verification.Cluster;
 import com.slamur.plagiarism.model.verification.Comparison;
 import com.slamur.plagiarism.service.Services;
@@ -14,6 +14,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TextArea;
@@ -28,9 +29,9 @@ public class ClusterController extends TabController {
 
     @FXML public Button saveCommentButton;
 
-    @FXML public ListView<Participant> leftParticipantListView;
+    @FXML public ListView<Solution> leftSolutionListView;
 
-    @FXML public ListView<Participant> rightParticipantListView;
+    @FXML public ListView<Solution> rightSolutionListView;
 
     @FXML public Label comparisonStatusLabel;
 
@@ -42,7 +43,7 @@ public class ClusterController extends TabController {
     public void initialize(URL url, ResourceBundle resourceBundle) {
         initializeClusterPart();
         initializeCommentPart();
-        initializeParticipantsPart();
+        initializeSolutionsPart();
 
         this.cluster = null;
     }
@@ -93,18 +94,18 @@ public class ClusterController extends TabController {
                 Services.verification().getJuryComment(cluster)
         );
 
-        setParticipants(cluster, leftParticipantListView);
-        setParticipants(cluster, rightParticipantListView);
+        setSolutions(cluster, leftSolutionListView);
+        setSolutions(cluster, rightSolutionListView);
     }
 
-    private static void setParticipants(Cluster cluster, ListView<Participant> participantListView) {
-        participantListView.setItems(
+    private static void setSolutions(Cluster cluster, ListView<Solution> solutionListView) {
+        solutionListView.setItems(
                 FXCollections.observableList(
-                        cluster.getParticipants()
+                        cluster.getSolutions()
                 )
         );
 
-        participantListView.getSelectionModel().select(0);
+        solutionListView.getSelectionModel().select(0);
     }
 
     private void initializeCommentPart() {
@@ -122,27 +123,38 @@ public class ClusterController extends TabController {
         clusterInfoTextArea.setText(cluster.toText());
     }
 
-    private void initializeParticipantsPart() {
-        initializeParticipantsListView(leftParticipantListView);
-        initializeParticipantsListView(rightParticipantListView);
+    private void initializeSolutionsPart() {
+        initializeSolutionListView(leftSolutionListView);
+        initializeSolutionListView(rightSolutionListView);
 
         goToComparisonsButton.setOnAction(this::goToComparisonAction);
     }
 
-    private void initializeParticipantsListView(ListView<Participant> participantListView) {
-        participantListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
-        participantListView.getSelectionModel().selectedItemProperty().addListener(
+    private void initializeSolutionListView(ListView<Solution> solutionListView) {
+        solutionListView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
+        solutionListView.getSelectionModel().selectedItemProperty().addListener(
                 (observableValue, oldParticipant, newParticipant) -> updateComparisonStatusAction()
         );
+
+        solutionListView.setCellFactory(listView -> new ListCell<>(){
+            @Override
+            protected void updateItem(Solution solution, boolean empty) {
+                super.updateItem(solution, empty);
+
+                if(empty || null == solution){
+                    setText("");
+                } else {
+                    setText(solution.getParticipant().toString());
+                }
+            }
+        });
     }
 
     private Optional<Comparison> getSelectedComparison() {
-        var left = leftParticipantListView.getSelectionModel().getSelectedItem();
-        var right = rightParticipantListView.getSelectionModel().getSelectedItem();
+        var left = leftSolutionListView.getSelectionModel().getSelectedItem();
+        var right = rightSolutionListView.getSelectionModel().getSelectedItem();
 
-        return  Services.verification().getComparison(
-                cluster, left, right
-        );
+        return  Services.verification().getComparison(left, right);
     }
 
     private void updateComparisonStatusAction() {

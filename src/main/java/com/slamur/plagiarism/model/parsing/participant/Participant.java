@@ -1,65 +1,31 @@
 package com.slamur.plagiarism.model.parsing.participant;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Objects;
 
-import com.slamur.plagiarism.model.parsing.Contest;
-import com.slamur.plagiarism.model.parsing.solution.Solution;
-import com.slamur.plagiarism.utils.RequestUtils;
+import com.slamur.plagiarism.model.parsing.contest.Contest;
 
 public class Participant {
 
-    public static final String PROFILE_PREFIX = "/ru/viewprofile/";
-
-    public static String getLinkByLogin(String login) {
-        return PROFILE_PREFIX + login + "/all";
-    }
-
-    public static Participant createSamaraParticipantFromLink(String link, Contest contest) {
-        if (link.endsWith("/")) link = link.substring(0, link.length() - 1);
-        if (link.contains("%20")) {
-            link = link.replace("%20", "");
-        }
-
-        String linkWithoutAll = link.substring(0, link.indexOf("/all"));
-        String login = linkWithoutAll.substring(linkWithoutAll.lastIndexOf("/") + 1);
-        String id = login.substring(login.indexOf("_") + 1);
-
-
-        return new Participant(link, id, login, contest.getProblemsCount());
-    }
-
-    // TODO separate participant and participant result (problemToBestSolutions)
-    // store map <participant -> participant result>
-    public final String link;
     public final String id;
     public final String login;
-    public final Solution[] problemToBestSolution;
-    public final List<Solution> allSolutions;
+    public final Contest contest;
 
-    public Participant(String link, String id, String login, int problemsCount) {
-        this.link = link;
-        this.id = id;
-        this.login = login;
-        this.problemToBestSolution = new Solution[problemsCount];
-        this.allSolutions = new ArrayList<>();
+    public Participant(String login, Contest contest) {
+        this(login, login, contest);
     }
 
-    public void addSolution(Solution solution, int problemIndex) {
-        allSolutions.add(solution);
+    public Participant(String login, String id, Contest contest) {
+        this.login = login;
+        this.id = id;
+        this.contest = contest;
+    }
 
-        // compare with old
-        Solution oldSolution = problemToBestSolution[problemIndex];
+    public String getLogin() {
+        return login;
+    }
 
-        boolean needUpdate = (null == oldSolution)
-                || oldSolution.score < solution.score
-                || oldSolution.score == solution.score
-                    && oldSolution.dateTime.compareTo(solution.dateTime) > 0;
-
-        if (needUpdate) {
-            problemToBestSolution[problemIndex] = solution;
-        }
+    public Contest getContest() {
+        return contest;
     }
 
     @Override
@@ -85,11 +51,7 @@ public class Participant {
         return Objects.hash(id);
     }
 
-    public String getFullLink() {
-        return RequestUtils.DOMAIN + link;
-    }
-
     public String toText() {
-        return getFullLink();
+        return contest.toText(this);
     }
 }

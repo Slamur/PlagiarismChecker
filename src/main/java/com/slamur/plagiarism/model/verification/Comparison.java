@@ -2,36 +2,28 @@ package com.slamur.plagiarism.model.verification;
 
 import java.util.Objects;
 
-import com.slamur.plagiarism.model.parsing.participant.Participant;
-import com.slamur.plagiarism.utils.ModelUtils;
+import com.slamur.plagiarism.model.IdsPair;
+import com.slamur.plagiarism.model.parsing.solution.Solution;
 
 public class Comparison {
 
-    public final Participant left, right;
+    public final Solution left, right;
 
-    public final int problemId;
-
-    public Comparison(Participant left, Participant right, int problemId) {
-        if (left.id.compareTo(right.id) > 0) {
-            Participant tmp = left;
-            left = right;
-            right = tmp;
-        }
-
+    public Comparison(Solution left, Solution right) {
         this.left = left;
         this.right = right;
-        this.problemId = problemId;
     }
 
     public String getProblemName() {
-        return ModelUtils.getProblemName(problemId);
+        return left.problemName;
     }
 
     @Override
     public String toString() {
         return String.format(
-                "%s - %s (%s)",
-                left.id, right.id, getProblemName()
+                "%s (%s) - %s (%s)",
+                left.id, left.getParticipant().login,
+                right.id, right.getParticipant().login
         );
     }
 
@@ -44,13 +36,23 @@ public class Comparison {
             return false;
         }
         Comparison that = (Comparison) o;
-        return problemId == that.problemId &&
-                Objects.equals(left, that.left) &&
+        return Objects.equals(left, that.left) &&
                 Objects.equals(right, that.right);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(left, right, problemId);
+        return Objects.hash(left, right);
+    }
+
+    public IdsPair toIds() {
+        return new IdsPair(left.id, right.id);
+    }
+
+    public IdsPair toParticipantIds() {
+        return new IdsPair(
+            left.getParticipant().id,
+            right.getParticipant().id
+        );
     }
 }

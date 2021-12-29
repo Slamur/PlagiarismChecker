@@ -6,30 +6,36 @@ import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
-import com.slamur.plagiarism.model.parsing.participant.Participant;
-import com.slamur.plagiarism.utils.ModelUtils;
+import com.slamur.plagiarism.model.parsing.solution.Solution;
 
 public class Cluster {
 
     public static final String SEPARATOR = "===========================================";
 
-    private final int problemId;
+    private final String problemName;
 
     private final List<Clique> cliques;
-    private final Map<Participant, Clique> participantToClique;
+    private final Map<Solution, Clique> solutionToClique;
 
     private final Map<String, String> comments;
 
-    private final Map<Participant, List<Participant>> weakConnections;
-    private final Map<Participant, List<Participant>> strongConnections;
+    private final Map<Solution, List<Solution>> weakConnections;
+    private final Map<Solution, List<Solution>> strongConnections;
 
-    public Cluster(int problemId) {
-        this.problemId = problemId;
+    public Cluster(Solution startSolution) {
+        this(startSolution.problemName);
+        addSolution(startSolution);
+    }
+
+    private Cluster(String problemName) {
+        this.problemName = problemName;
 
         this.cliques = new ArrayList<>();
-        this.participantToClique = new LinkedHashMap<>();
+        this.solutionToClique = new LinkedHashMap<>();
 
         this.comments = new HashMap<>();
 
@@ -37,29 +43,31 @@ public class Cluster {
         this.strongConnections = new HashMap<>();
     }
 
-    public void addParticipant(Participant participant) {
-        Clique clique = new Clique(problemId);
-        clique.getParticipants().add(participant);
+    public void addSolution(Solution solution) {
+        if (solutionToClique.containsKey(solution)) return;
 
-        weakConnections.put(participant, new ArrayList<>());
-        strongConnections.put(participant, new ArrayList<>());
+        Clique clique = new Clique();
+        clique.addSolution(solution);
+
+        weakConnections.put(solution, new ArrayList<>());
+        strongConnections.put(solution, new ArrayList<>());
 
         addClique(clique);
     }
 
     private void addClique(Clique clique) {
         cliques.add(clique);
-        clique.getParticipants().forEach(
-                participant -> participantToClique.put(participant, clique)
+        clique.getSolutions().forEach(
+                solution -> solutionToClique.put(solution, clique)
         );
     }
 
     public int size() {
-        return participantToClique.size();
+        return solutionToClique.size();
     }
 
-    public int getProblemId() {
-        return problemId;
+    public String getProblemName() {
+        return problemName;
     }
 
     synchronized public void setComment(String author, String comment) {
@@ -70,13 +78,13 @@ public class Cluster {
         return comments.getOrDefault(author, "");
     }
 
-    public List<Participant> getParticipants() {
-        return new ArrayList<>(participantToClique.keySet());
+    public List<Solution> getSolutions() {
+        return new ArrayList<>(solutionToClique.keySet());
     }
 
     public void mergeWith(Cluster otherCluster) {
         cliques.addAll(otherCluster.cliques);
-        participantToClique.putAll(otherCluster.participantToClique);
+        solutionToClique.putAll(otherCluster.solutionToClique);
 
         strongConnections.putAll(otherCluster.strongConnections);
         weakConnections.putAll(otherCluster.weakConnections);
@@ -110,14 +118,10 @@ public class Cluster {
         return builder.toString();
     }
 
-    public String problemToText() {
-        return ModelUtils.getProblemName(problemId) + "\n";
-    }
-
     public String toText() {
         var builder = new StringBuilder();
 
-        builder.append(problemToText()).append("\n");
+        builder.append(problemName).append("\n");
 
         for (Clique clique : cliques) {
             builder.append(clique).append("\n");
@@ -134,17 +138,18 @@ public class Cluster {
 
     @Override
     public String toString() {
-        String minParticipantId = getParticipants().stream()
+        String minParticipantId = getSolutions().stream()
+                .map(Solution::getParticipant)
                 .map(participant -> participant.id)
                 .min(String::compareTo)
                 .orElse("-1");
 
-        return minParticipantId + " " + ModelUtils.getProblemName(problemId);
+        return minParticipantId + " " + problemName;
     }
 
-    public void mergeCliques(Participant left, Participant right) {
-        var leftClique = participantToClique.get(left);
-        var rightClique = participantToClique.get(right);
+    public void mergeCliques(Solution left, Solution right) {
+        var leftClique = solutionToClique.get(left);
+        var rightClique = solutionToClique.get(right);
 
         if (leftClique == rightClique) return;
 
@@ -155,13 +160,13 @@ public class Cluster {
         }
 
         leftClique.mergeWith(rightClique);
-        for (Participant participant : rightClique.getParticipants()) {
-            participantToClique.put(participant, leftClique);
+        for (var solution : rightClique.getSolutions()) {
+            solutionToClique.put(solution, leftClique);
         }
         cliques.remove(rightClique);
     }
 
-    public void setStrongEdge(Participant left, Participant right) {
+    public void setStrongEdge(Solution left, Solution right) {
         if (strongConnections.get(left).contains(right)) return;
 
         strongConnections.get(left).add(right);
@@ -170,27 +175,28 @@ public class Cluster {
         mergeCliques(left, right);
     }
 
-    private void divideClique(Participant left, Participant right) {
-        var leftClique = participantToClique.get(left);
-        var rightClique = participantToClique.get(right);
+    private void divideClique(Solution left, Solution right) {
+        var leftClique = solutionToClique.get(left);
+        var rightClique = solutionToClique.get(right);
 
         if (leftClique != rightClique) return;
 
-        var cliqueParticipants = leftClique.getParticipants();
+        var cliqueSolutions = leftClique.getSolutions();
 
-        List<Participant> dividedParticipants = getDividedPart(left, cliqueParticipants);
-        if (dividedParticipants == null) {
+        List<Solution> dividedSolutions = getDividedPart(left, cliqueSolutions);
+        if (dividedSolutions.isEmpty()) {
+            // clique was not divided
             return;
         }
 
-        rightClique = new Clique(problemId);
-        rightClique.getParticipants().addAll(dividedParticipants);
+        rightClique = new Clique();
+        dividedSolutions.forEach(rightClique::addSolution);
         addClique(rightClique);
     }
 
-    private List<Participant> getDividedPart(Participant startParticipant, List<Participant> allParticipants) {
-        List<Participant> leftConnections = new ArrayList<>();
-        leftConnections.add(startParticipant);
+    private List<Solution> getDividedPart(Solution startSolution, List<Solution> allSolutions) {
+        List<Solution> leftConnections = new ArrayList<>();
+        leftConnections.add(startSolution);
 
         for (int index = 0; index < leftConnections.size(); ++index) {
             var from = leftConnections.get(index);
@@ -201,25 +207,18 @@ public class Cluster {
             }
         }
 
-        if (leftConnections.size() == allParticipants.size()){
-            // clique is not divided
-            return null;
-        }
-
-        List<Participant> rightConnections = new ArrayList<>();
-        for (var participant : allParticipants) {
-            if (!leftConnections.contains(participant)) {
-                rightConnections.add(participant);
-            }
-        }
+        List<Solution> rightConnections = allSolutions.stream()
+                .filter(solution -> !leftConnections.contains(solution))
+                .collect(Collectors.toList());
 
         if (leftConnections.size() < rightConnections.size()) {
             rightConnections = leftConnections;
         }
+
         return rightConnections;
     }
 
-    public void setWeakEdge(Participant left, Participant right) {
+    public void setWeakEdge(Solution left, Solution right) {
         if (!strongConnections.get(left).contains(right)) return;
 
         strongConnections.get(left).remove(right);
@@ -228,27 +227,28 @@ public class Cluster {
         divideClique(left, right);
     }
 
-    public Cluster removeWeakEdge(Participant left, Participant right) {
-        // on case it was strong
+    public Optional<Cluster> removeWeakEdge(Solution left, Solution right) {
+        // in case it was strong
         setWeakEdge(left, right);
 
-        List<Participant> dividedParticipants = getDividedPart(left, getParticipants());
-        if (null == dividedParticipants) {
+        var dividedSolutions = getDividedPart(left, getSolutions());
+        if (dividedSolutions.isEmpty()) {
             // cluster was not divided
-            return null;
+            return Optional.empty();
         }
 
-        Cluster dividedCluster = new Cluster(problemId);
+        Cluster dividedCluster = new Cluster(problemName);
 
         Set<Clique> dividedCliques = new HashSet<>();
-        for (var participant : dividedParticipants) {
-            dividedCliques.add(participantToClique.remove(participant));
+        for (var solution : dividedSolutions) {
+            var clique = solutionToClique.remove(solution);
+            dividedCliques.add(clique);
 
-            var participantWeaks = weakConnections.remove(participant);
-            var participantStrongs = strongConnections.remove(participant);
+            var solutionWeaks = weakConnections.remove(solution);
+            var solutionStrongs = strongConnections.remove(solution);
 
-            dividedCluster.weakConnections.put(participant, participantWeaks);
-            dividedCluster.strongConnections.put(participant, participantStrongs);
+            dividedCluster.weakConnections.put(solution, solutionWeaks);
+            dividedCluster.strongConnections.put(solution, solutionStrongs);
         }
 
         for (var clique : dividedCliques) {
@@ -256,10 +256,10 @@ public class Cluster {
             dividedCluster.addClique(clique);
         }
 
-        return dividedCluster;
+        return Optional.of(dividedCluster);
     }
 
-    public Clique getClique(Participant participant) {
-        return participantToClique.get(participant);
+    public Clique getClique(Solution solution) {
+        return solutionToClique.get(solution);
     }
 }

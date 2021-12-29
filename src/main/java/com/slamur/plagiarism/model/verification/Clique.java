@@ -1,37 +1,43 @@
 package com.slamur.plagiarism.model.verification;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import com.slamur.plagiarism.model.parsing.participant.Participant;
+import com.slamur.plagiarism.model.parsing.solution.Solution;
 
 public class Clique {
 
-    private final int problemId;
-    private final List<Participant> participants;
+    private final List<Solution> solutions;
 
-    Clique(int problemId) {
-        this.problemId = problemId;
-        this.participants = new ArrayList<>();
+    Clique() {
+        this.solutions = new ArrayList<>();
     }
 
-    public List<Participant> getParticipants() {
-        return participants;
+    public List<Solution> getSolutions() {
+        return Collections.unmodifiableList(solutions);
+    }
+
+    public void addSolution(Solution solution) {
+        solutions.add(solution);
     }
 
     public int size() {
-        return getParticipants().size();
+        return solutions.size();
     }
 
     public void mergeWith(Clique otherClique) {
-        participants.addAll(otherClique.participants);
+        solutions.addAll(otherClique.solutions);
     }
 
     public String participantsToText() {
         var builder = new StringBuilder();
-        for (Participant participant : participants) {
-            builder.append(participant.toText()).append("\n");
-        }
+
+        solutions.stream()
+                .map(Solution::getParticipant)
+                .map(Participant::toText)
+                .forEach(text -> builder.append(text).append("\n"));
 
         return builder.toString();
     }
@@ -39,12 +45,13 @@ public class Clique {
     public String solutionsToText() {
         var builder = new StringBuilder();
 
-        for (Participant participant : participants) {
-            builder.append(participant.login)
-                    .append("\t")
-                    .append(participant.problemToBestSolution[problemId])
-                    .append("\n");
-        }
+        solutions.forEach(solution -> {
+                    var participant = solution.getParticipant();
+                    builder.append(participant.login)
+                            .append("\t")
+                            .append(solution)
+                            .append("\n");
+                });
 
         return builder.toString();
     }

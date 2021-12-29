@@ -42,6 +42,8 @@ public class MainController implements Controller {
 
     @FXML public MenuItem saveReportMenuItem;
 
+    @FXML public MenuItem saveStandingsMenuItem;
+
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
         initializeTabPane();
@@ -88,6 +90,7 @@ public class MainController implements Controller {
         saveRawDataMenuItem.setOnAction(this::saveRawDataAction);
         loadRawDataMenuItem.setOnAction(this::loadRawDataAction);
         saveReportMenuItem.setOnAction(this::saveReportAction);
+        saveStandingsMenuItem.setOnAction(this::saveStandingsAction);
     }
 
     private void saveRawDataAction(ActionEvent event) {
@@ -130,6 +133,30 @@ public class MainController implements Controller {
         } catch (Exception e) {
             AlertUtils.error(
                     "Ошибка при сохранении протокола", e
+            );
+        }
+
+        try {
+            Services.verification().saveBansToFile();
+            AlertUtils.information(
+                    "Баны сохранены"
+            );
+        } catch (Exception e) {
+            AlertUtils.error(
+                    "Ошибка при сохранении банов", e
+            );
+        }
+    }
+
+    private void saveStandingsAction(ActionEvent event) {
+        try {
+            Services.contest().saveStandings();
+            AlertUtils.information(
+                    "Положение участников сохранено"
+            );
+        } catch (Exception e) {
+            AlertUtils.error(
+                    "Ошибка при сохранении положения участников", e
             );
         }
     }

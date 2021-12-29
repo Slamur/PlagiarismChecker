@@ -11,4 +11,6 @@ module PlagiarismChecker {
     opens com.slamur.plagiarism ;
     exports com.slamur.plagiarism.model.parsing.participant;
     exports com.slamur.plagiarism.model.parsing.solution;
+    exports com.slamur.plagiarism.model.parsing.contest;
+    exports com.slamur.plagiarism.service.impl.contest;
 }

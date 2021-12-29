@@ -1,22 +1,23 @@
 package com.slamur.plagiarism.controller.impl;
 
 import java.net.URL;
-import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.ResourceBundle;
+import java.util.function.Function;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
-import com.slamur.plagiarism.model.parsing.participant.Participant;
 import com.slamur.plagiarism.model.parsing.solution.Solution;
 import com.slamur.plagiarism.model.parsing.solution.Verdict;
 import com.slamur.plagiarism.model.verification.Cluster;
 import com.slamur.plagiarism.model.verification.Comparison;
 import com.slamur.plagiarism.model.verification.Status;
 import com.slamur.plagiarism.service.Services;
+import com.slamur.plagiarism.utils.AlertUtils;
 import com.slamur.plagiarism.utils.FxmlUtils;
-import com.slamur.plagiarism.utils.ModelUtils;
 import com.slamur.plagiarism.utils.StreamUtils;
 import javafx.application.Platform;
 import javafx.event.ActionEvent;
@@ -56,6 +57,10 @@ public class DiffController extends TabController {
     @FXML public CheckBox useParticipantFilterCheckBox;
 
     @FXML public TextField participantIdFilterTextField;
+
+    @FXML public CheckBox useSolutionFilterCheckBox;
+
+    @FXML public TextField solutionIdFilterTextField;
 
     @FXML public CheckBox useClusterFilterCheckBox;
 
@@ -97,11 +102,15 @@ public class DiffController extends TabController {
 
     @FXML public TextArea clusterCommentsTextArea;
 
+    @FXML public Spinner<Integer> minAutoPlagiatProblemsSpinner;
+
+    @FXML public Button runAutoPlagiatButton;
+
     private int comparisonIndex;
     private Comparison comparison;
 
-    private CheckBox[] problemFilters;
-    private EnumMap<Status, CheckBox> statusFilters;
+    private Map<String, CheckBox> problemToFilter;
+    private EnumMap<Status, CheckBox> statusToFilter;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -109,9 +118,40 @@ public class DiffController extends TabController {
         initializeDiffPart();
         initializeBlindMode();
         initializeMovePart();
+        initializeAutoPlagiatPart();
 
         this.comparison = null;
         this.comparisonIndex = -1;
+    }
+
+    private void initializeAutoPlagiatPart() {
+        var contest = Services.contest();
+
+        minAutoPlagiatProblemsSpinner.setEditable(true);
+
+        int defaultMinAutoPlagiatProblemsCount = 2;
+        minAutoPlagiatProblemsSpinner.setValueFactory(
+                new SpinnerValueFactory.IntegerSpinnerValueFactory(
+                        1,
+                        contest.getContest().getProblems().size(),
+                        defaultMinAutoPlagiatProblemsCount
+                )
+        );
+
+        runAutoPlagiatButton.setOnAction(this::runAutoPlagiatAction);
+    }
+
+    private void runAutoPlagiatAction(ActionEvent event) {
+        int minAutoPlagiatProblemsCount = minAutoPlagiatProblemsSpinner.getValue();
+        double minAutoPlagiatSimilarity = minSimilaritySpinner.getValue();
+
+        Services.verification().runAutoPlagiat(
+                minAutoPlagiatProblemsCount,
+                minAutoPlagiatSimilarity,
+                () -> Platform.runLater(
+                        () -> AlertUtils.information("Автоматическая проверка на плагиат завершена")
+                )
+        );
     }
 
     private void initializeMovePart() {
@@ -160,21 +200,23 @@ public class DiffController extends TabController {
     private void initializeComparisonsFiltersPart() {
         var contest = Services.contest();
 
-        this.problemFilters = new CheckBox[contest.getProblemsCount()];
-        for (int problem = 0; problem < problemFilters.length; ++problem) {
-            var problemFilter = new CheckBox(ModelUtils.getProblemName(problem));
-            problemFilters[problem] = problemFilter;
+        this.problemToFilter = contest.getProblems().stream()
+                .collect(Collectors.toMap(
+                        Function.identity(),
+                        CheckBox::new
+                ));
 
-            problemFiltersHBox.getChildren().add(problemFilter);
-        }
+        problemFiltersHBox.getChildren().addAll(
+                problemToFilter.values()
+        );
 
-        this.statusFilters = new EnumMap<>(Status.class);
+        this.statusToFilter = new EnumMap<>(Status.class);
         for (Status status : Status.values()) {
             var statusFilter = new CheckBox(status.text);
-            statusFilters.put(status, statusFilter);
-
-            statusFiltersHBox.getChildren().add(statusFilter);
+            statusToFilter.put(status, statusFilter);
         }
+
+        statusFiltersHBox.getChildren().addAll(statusToFilter.values());
 
         minSimilaritySpinner.setEditable(true);
         minSimilaritySpinner.setValueFactory(
@@ -196,13 +238,8 @@ public class DiffController extends TabController {
 
         filterComparisonsButton.setOnAction(actionEvent -> updateComparisonsListView());
 
-        for (CheckBox problemFilter : problemFilters) {
-            problemFilter.setSelected(true);
-        }
-
-        for (CheckBox statusFilter : statusFilters.values()) {
-            statusFilter.setSelected(true);
-        }
+        problemToFilter.values().forEach(filter -> filter.setSelected(true));
+        statusToFilter.values().forEach(filter -> filter.setSelected(true));
     }
 
     private void initializeComparisonsListView() {
@@ -236,6 +273,7 @@ public class DiffController extends TabController {
             statusToColor.put(Status.NOT_SEEN, Color.WHITE);
             statusToColor.put(Status.IGNORED, Color.GREEN);
             statusToColor.put(Status.UNKNOWN, Color.YELLOW);
+            statusToColor.put(Status.AUTOPLAGIAT, Color.BLUEVIOLET);
             statusToColor.put(Status.PLAGIAT, Color.RED);
         }
 
@@ -279,22 +317,32 @@ public class DiffController extends TabController {
         }
     }
 
+    private int updateComparisonsListView(Comparison comparison,
+                                           Status status) {
+        return 1;
+
+        // FIXME
+//        if (!statusToFilter.get(status).isSelected()) {
+////            comparisonsListView.getItems().remove(comparison);
+//            return 0;
+//        } else {
+//            return 1;
+//        }
+    }
+
     private void updateComparisonsListView() {
         double minSimilarity = minSimilaritySpinner.getValue();
 
-        List<Integer> expectedProblems = new ArrayList<>();
-        for (int problem = 0; problem < problemFilters.length; ++problem) {
-            if (problemFilters[problem].isSelected()) {
-                expectedProblems.add(problem);
-            }
-        }
+        // TODO add class for valueToFilter
+        var expectedProblems = problemToFilter.entrySet().stream()
+                .filter(e -> e.getValue().isSelected())
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toUnmodifiableList());
 
-        List<Status> expectedStatuses = new ArrayList<>();
-        for (var statusEntry : statusFilters.entrySet()) {
-            if (statusEntry.getValue().isSelected()) {
-                expectedStatuses.add(statusEntry.getKey());
-            }
-        }
+        var expectedStatuses = statusToFilter.entrySet().stream()
+                .filter(e -> e.getValue().isSelected())
+                .map(Map.Entry::getKey)
+                .collect(Collectors.toUnmodifiableList());
 
         var comparisons = Services.comparisons();
         var verification = Services.verification();
@@ -309,12 +357,13 @@ public class DiffController extends TabController {
                 ? comparisons.withParticipant(participantIdFilterTextField.getText())
                 : (comparison) -> true;
 
-        Predicate<Comparison> atLeastOneAcFilter = (comparison) -> {
-            int problemId = comparison.problemId;
-            Solution left = comparison.left.problemToBestSolution[problemId];
-            Solution right = comparison.right.problemToBestSolution[problemId];
-            return Verdict.AC == left.verdict || Verdict.AC == right.verdict;
-        };
+        Predicate<Comparison> solutionFilter = useSolutionFilterCheckBox.isSelected()
+                ? comparisons.withSolution(solutionIdFilterTextField.getText())
+                : (comparison) -> true;
+
+        Predicate<Comparison> atLeastOneAcFilter = (comparison) ->
+                Verdict.AC == comparison.left.verdict
+                        || Verdict.AC == comparison.right.verdict;
 
         var predicate = StreamUtils.and(
                 comparisons.moreThan(minSimilarity),
@@ -322,6 +371,7 @@ public class DiffController extends TabController {
                 verification.withStatus(expectedStatuses),
                 clusterFilter,
                 participantFilter,
+                solutionFilter,
                 atLeastOneAcFilter
         );
 
@@ -359,7 +409,9 @@ public class DiffController extends TabController {
         var clusterOptional = Services.verification().getCluster(comparison);
         goToClusterButton.setDisable(clusterOptional.isEmpty());
 
-        clusterOptional.ifPresent(cluster -> clusterCommentsTextArea.setText(cluster.commentsToText(false)));
+        clusterOptional.ifPresent(cluster -> clusterCommentsTextArea.setText(
+                cluster.commentsToText(false))
+        );
 
         comparisonInfoLabel.setText(comparison.getProblemName());
 
@@ -376,16 +428,25 @@ public class DiffController extends TabController {
                 String.format("%s%n(%s)", actualStatus.text, expectedStatusText)
         );
 
-        showParticipantSolution(comparison.left, comparison.problemId, leftCodeInfoLabel, leftParticipantInfoTextArea, leftCodeTextArea);
-        showParticipantSolution(comparison.right, comparison.problemId, rightCodeInfoLabel, rightParticipantInfoTextArea, rightCodeTextArea);
+        showParticipantSolution(
+                comparison.left,
+                leftCodeInfoLabel,
+                leftParticipantInfoTextArea,
+                leftCodeTextArea
+        );
+        showParticipantSolution(
+                comparison.right,
+                rightCodeInfoLabel,
+                rightParticipantInfoTextArea,
+                rightCodeTextArea
+        );
     }
 
-    private void showParticipantSolution(Participant participant,
-                                         int problemId,
+    private void showParticipantSolution(Solution solution,
                                          Label codeInfoLabel,
                                          TextArea participantInfoTextArea,
                                          TextArea codeTextArea) {
-        var solution = participant.problemToBestSolution[problemId];
+        var participant = solution.getParticipant();
 
         participantInfoTextArea.setText(
                 Services.contest().getInfo(participant) + "\n"
@@ -393,8 +454,7 @@ public class DiffController extends TabController {
                 + solution.getFullLink()
         );
 
-        String codeInfoText = solution.verdict + "\t"
-                + solution.score;
+        String codeInfoText = solution.verdict + "\t" + solution.score;
 
         if (!blindModeCheckBox.selectedProperty().getValue()) {
             codeInfoText += "\t" + solution.getDateTimeString();
@@ -402,7 +462,7 @@ public class DiffController extends TabController {
 
         codeInfoLabel.setText(codeInfoText);
 
-        codeTextArea.setText(solution.code);
+        codeTextArea.setText(solution.getProgram().code);
     }
 
     private void initializeComparisonInfoLabel() {
@@ -468,26 +528,27 @@ public class DiffController extends TabController {
         ignoreButton.setOnAction(this::ignoreAction);
     }
 
-    private void updateStatus(Status status) {
+    private int updateStatus(Status status) {
         Services.verification().setStatus(comparison, status);
         comparisonStatusLabel.setText(status.text);
-        updateComparisonsListView();
+        int shift = updateComparisonsListView(comparison, status);
         selectComparison(comparisonIndex);
+        return shift;
     }
 
     public void plagiatAction(ActionEvent event) {
-        updateStatus(Status.PLAGIAT);
-        moveNext();
+        int shift = updateStatus(Status.PLAGIAT);
+        move(shift);
     }
 
     public void unknownAction(ActionEvent event) {
-        updateStatus(Status.UNKNOWN);
-        moveNext();
+        int shift = updateStatus(Status.UNKNOWN);
+        move(shift);
     }
 
     public void ignoreAction(ActionEvent event) {
-        updateStatus(Status.IGNORED);
-        move(0);
+        int shift = updateStatus(Status.IGNORED);
+        move(shift);
     }
 
     public void goToClusterAction(ActionEvent event) {
@@ -505,13 +566,10 @@ public class DiffController extends TabController {
 
         useClusterFilterCheckBox.setSelected(true);
 
-        for (var problemFilter : problemFilters) {
-            problemFilter.setSelected(false);
-        }
+        problemToFilter.values().forEach(filter -> filter.setSelected(false));
+        problemToFilter.get(cluster.getProblemName()).setSelected(true);
 
-        problemFilters[cluster.getProblemId()].setSelected(true);
-
-        for (var statusFilter : statusFilters.values()) {
+        for (var statusFilter : statusToFilter.values()) {
             statusFilter.setSelected(true);
         }
 

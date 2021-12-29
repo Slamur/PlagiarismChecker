@@ -1,28 +1,26 @@
 package com.slamur.plagiarism.service.impl;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
-import com.slamur.plagiarism.model.parsing.Contest;
-import com.slamur.plagiarism.model.parsing.participant.Participant;
+import com.slamur.plagiarism.model.IdsPair;
+import com.slamur.plagiarism.model.parsing.contest.Contest;
+import com.slamur.plagiarism.model.parsing.solution.Language;
 import com.slamur.plagiarism.model.parsing.solution.Solution;
+import com.slamur.plagiarism.model.parsing.solution.SolutionProgram;
 import com.slamur.plagiarism.model.parsing.solution.Verdict;
 import com.slamur.plagiarism.model.verification.Comparison;
 import com.slamur.plagiarism.service.Services;
+import com.slamur.plagiarism.service.impl.comparison.ComparisonRepository;
+import com.slamur.plagiarism.service.impl.contest.ContestRepository;
 import com.slamur.plagiarism.utils.AlertUtils;
 import com.slamur.plagiarism.utils.RandomUtils;
 import javafx.collections.FXCollections;
@@ -30,158 +28,164 @@ import javafx.collections.ObservableList;
 
 public class ComparisonService extends ServiceBase {
 
-    private static final EnumSet<Verdict> notScanningVerdicts = EnumSet.of(Verdict.WA, Verdict.CE);
+    private static final EnumSet<Verdict> notScanningVerdicts = EnumSet.of(Verdict.WA, Verdict.CE, Verdict.PE, Verdict.RE, Verdict.TL);
     private static final boolean onlyEqualScoreScan = true;
 
+    // TODO make it comparison parameter
     private static final double solutionSimilarityFilter = 0.9;
 
-    private static final String comparisonsFileName = "comparisons";
+    private static final double minimalSimilarityLimit = 0.7;
 
     private final ObservableList<Comparison> comparisons;
-    private final Map<Comparison, Double> similarityByComparison;
 
-    private File comparisonsFile;
+    private ComparisonRepository comparisonRepository;
+    private final Map<IdsPair, Double> similarities;
 
     public ComparisonService() {
         this.comparisons = FXCollections.observableArrayList();
-        this.similarityByComparison = new HashMap<>();
+        this.similarities = new HashMap<>();
     }
 
     @Override
     protected void initializeOnly() {
-        var participants = Services.contest().getParticipants();
+        var solutions = Services.contest().getSolutions();
 
         Contest contest = Services.contest().getContest();
 
         try {
-            this.comparisonsFile = new File(contest.createFolder(), comparisonsFileName + ".txt");
-            if (!comparisonsFile.exists()) {
-                if (!comparisonsFile.createNewFile()) {
-                    throw new IOException("Неудачное создание файла");
-                }
-            }
+            var contestRepository = ContestRepository.createRepository(contest);
+            this.comparisonRepository = contestRepository.createComparisonRepository();
         } catch (IOException e) {
-            AlertUtils.warning("Проблема с кешированием сравнений", e);
+            AlertUtils.warning("Проблема с созданием репозитория сравнений", e);
         }
 
-        loadComparisons(participants);
-        generateComparisons(participants);
-    }
-
-    private void loadComparisons(List<Participant> participants) {
-        try (BufferedReader in = new BufferedReader(new FileReader(comparisonsFile))){
-            Map<String, Participant> participantsById = new HashMap<>();
-            for (Participant participant : participants) {
-                participantsById.put(participant.id, participant);
+        try {
+            for (String problemName : contest.getProblems()) {
+                similarities.putAll(
+                        comparisonRepository.loadSimilarities(solutionSimilarityFilter, problemName)
+                );
             }
-
-            in.lines().forEach(line -> {
-                StringTokenizer tok = new StringTokenizer(line, " -()");
-
-                String leftId = tok.nextToken();
-                String rightId = tok.nextToken();
-                int problemId = tok.nextToken().charAt(0) - 'A';
-
-                double similarity = Double.parseDouble(tok.nextToken());
-
-                var left = participantsById.get(leftId);
-                var right = participantsById.get(rightId);
-
-                if (null != left && null != right) {
-                    var comparison = new Comparison(
-                            left, right, problemId
-                    );
-
-                    saveResult(comparison, similarity);
-                }
-
-            });
         } catch (IOException e) {
             e.printStackTrace();
+            AlertUtils.warning("Проблема с загрузкой сравнений", e);
         }
+
+        generateComparisons(solutions);
     }
 
-    private void saveResult(Comparison comparison, double similarity) {
-        similarityByComparison.put(comparison, similarity);
-    }
+    private void generateComparisons(List<Solution> solutions) {
+        System.out.printf("Количество решений %d%n", solutions.size());
 
-    private void generateComparisons(List<Participant> participants) {
-        List<Comparison> notCachedBefore = new ArrayList<>();
+        int blockSize = 10;
 
-        int problemsCount = Services.contest().getProblemsCount();
+        for (int leftIndex = 0; leftIndex < solutions.size(); ++leftIndex) {
+            var leftSolution = solutions.get(leftIndex);
 
-        for (int leftIndex = 0; leftIndex < participants.size(); ++leftIndex) {
-            for (int rightIndex = leftIndex + 1; rightIndex < participants.size(); ++rightIndex) {
-                for (int problemIndex = 0; problemIndex < problemsCount; ++problemIndex) {
-                    var comparison = compare(
-                            participants.get(leftIndex),
-                            participants.get(rightIndex),
-                            problemIndex
-                    );
+            if (leftIndex % blockSize == blockSize - 1) {
+                System.out.printf("Начаты сравнения с %d-м решением %s (%s) %n",
+                        leftIndex, leftSolution.id, leftSolution.getParticipant().login
+                );
+            }
 
-                    if (null != comparison) {
+            List<Comparison> notCachedBefore = new ArrayList<>();
+
+            for (int rightIndex = leftIndex + 1; rightIndex < solutions.size(); ++rightIndex) {
+                var rightSolution = solutions.get(rightIndex);
+
+                if (isComparisonNeeded(leftSolution, rightSolution)) {
+                    var comparison = new Comparison(leftSolution, rightSolution);
+                    comparisons.add(comparison);
+
+                    similarities.computeIfAbsent(comparison.toIds(), (ids) -> {
+                        double similarity = SolutionProgram.calculateSimilarity(
+                                leftSolution.getProgram(),
+                                rightSolution.getProgram(),
+                                solutionSimilarityFilter,
+                                minimalSimilarityLimit
+                        );
+
                         notCachedBefore.add(comparison);
-                    }
+
+                        return similarity;
+                    });
                 }
             }
-        }
 
-        if (null != comparisonsFile) {
-            try (PrintWriter out = new PrintWriter(
-                    new BufferedWriter(new FileWriter(comparisonsFile, true)))
-            ) {
-                notCachedBefore.forEach(comparison -> out.println(comparison + " " + similarityByComparison.get(comparison)));
+            if (leftIndex % blockSize == blockSize - 1) {
+                System.out.printf("Закончены сравнения с %d-м решением %s (%s) %n",
+                        leftIndex, leftSolution.id, leftSolution.getParticipant().id
+                );
+            }
+
+            try {
+                comparisonRepository.saveSimilarities(
+                        notCachedBefore.stream()
+                                .collect(Collectors.toMap(
+                                        Function.identity(),
+                                        (comparison) -> similarities.get(comparison.toIds())
+                                )),
+                        solutionSimilarityFilter
+                );
             } catch (IOException e) {
-                AlertUtils.warning("Не смогли кешировать сравнения", e);
+                AlertUtils.warning(
+                        String.format(
+                                "Не смогли закешировать новые сравнения с решением %s", leftSolution.id
+                        ), e
+                );
             }
         }
     }
 
-    public Comparison compare(Participant left, Participant right, int problemIndex) {
-        var leftSolution = left.problemToBestSolution[problemIndex];
-        var rightSolution = right.problemToBestSolution[problemIndex];
-
+    public boolean isComparisonNeeded(Solution leftSolution, Solution rightSolution) {
         if (null == leftSolution || null == rightSolution) {
-            return null;
+            return false;
+        }
+
+        if (!leftSolution.getProblemName().equals(rightSolution.getProblemName())) {
+            return false;
         }
 
         if (notScanningVerdicts.contains(leftSolution.verdict)
                 || notScanningVerdicts.contains(rightSolution.verdict)) {
-            return null;
+            return false;
+        }
+
+        // TODO Do we need compare two solutions of the same participant?
+        if (leftSolution.getParticipant().equals(rightSolution.getParticipant())) {
+            return false;
+        }
+
+        // TODO beatify later
+        if (Language.TEXT == leftSolution.getProgram().language || Language.TEXT == rightSolution.getProgram().language) {
+            return false;
         }
 
         if (onlyEqualScoreScan) {
-            if (leftSolution.score != rightSolution.score) {
-                return null;
-            }
+            return leftSolution.score == rightSolution.score;
         }
 
-        var comparison = new Comparison(left, right, problemIndex);
-        comparisons.add(comparison);
+        return true;
+    }
 
-        if (!similarityByComparison.containsKey(comparison)) {
-            double similarity = Solution.calculateSimilarity(leftSolution, rightSolution, solutionSimilarityFilter);
-            saveResult(comparison, similarity);
-
-            return comparison;
-        } else {
-            return null;
-        }
+    public double getSimilarity(Comparison comparison) {
+        return similarities.getOrDefault(comparison.toIds(), 0.0);
     }
 
     public ObservableList<Comparison> ordered() {
-        List<List<Comparison>> problemToComparisons = IntStream.range(0, Services.contest().getProblemsCount())
-                .mapToObj(problemId -> new ArrayList<Comparison>())
-                .collect(Collectors.toList());
+        Map<String, List<Comparison>> problemToComparisons = Services.contest().getProblems().stream()
+                .collect(Collectors.toMap(
+                        Function.identity(),
+                        (problemName) -> new ArrayList<>()
+                ));
 
         comparisons.forEach(
-                comparison -> problemToComparisons.get(comparison.problemId).add(comparison)
+                comparison -> problemToComparisons.get(comparison.getProblemName()).add(comparison)
         );
 
         var orderedComparisons = FXCollections.<Comparison>observableArrayList();
 
         problemToComparisons
-                .forEach(problemComparisons -> {
+                .forEach((problemName, problemComparisons) -> {
                     RandomUtils.shuffle(problemComparisons, Services.properties().getJury().hashCode());
                     orderedComparisons.addAll(problemComparisons);
                 });
@@ -195,22 +199,29 @@ public class ComparisonService extends ServiceBase {
 
     public Predicate<Comparison> moreThan(double minSimilarity) {
         return (comparison) ->
-                similarityByComparison.getOrDefault(comparison, 0.0) >= minSimilarity;
+                similarities.getOrDefault(comparison.toIds(), 0.0) >= minSimilarity;
     }
 
-    public Predicate<Comparison> forProblem(List<Integer> expectedProblems) {
+    public Predicate<Comparison> forProblem(Collection<String> expectedProblems) {
         return (comparison) ->
-                expectedProblems.contains(comparison.problemId);
+                expectedProblems.contains(comparison.getProblemName());
     }
 
     public Predicate<Comparison> withAuthorsOf(Comparison source) {
         return (comparison) ->
-                source.left == comparison.left && source.right == comparison.right;
+                source.left.getParticipant().equals(comparison.left.getParticipant())
+                && source.right.getParticipant().equals(comparison.right.getParticipant());
     }
 
     public Predicate<Comparison> withParticipant(String participantId) {
         return (comparison) ->
-                comparison.left.id.equals(participantId) || comparison.right.id.equals(participantId);
+                comparison.left.getParticipant().id.equals(participantId)
+                || comparison.right.getParticipant().id.equals(participantId);
+    }
+
+    public Predicate<Comparison> withSolution(String solutionId) {
+        return (comparison) ->
+                comparison.left.id.equals(solutionId) || comparison.right.id.equals(solutionId);
     }
 }
 

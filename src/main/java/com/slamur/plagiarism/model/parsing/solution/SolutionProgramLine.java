@@ -11,7 +11,7 @@ import java.util.Set;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 
-public class SolutionRow {
+public class SolutionProgramLine {
 
     final static String[] KEYWORDS = {
             "for", "while", "do",
@@ -104,7 +104,7 @@ public class SolutionRow {
         return isSpecial(word) || isNumber(word) || isKeyword(word);
     }
 
-    public static SolutionRow parse(String line) {
+    public static SolutionProgramLine parse(String line) {
         char[] s = line.toLowerCase().toCharArray();
 
         List<String> words = new ArrayList<>();
@@ -155,7 +155,7 @@ public class SolutionRow {
             }
         }
 
-        return new SolutionRow(words, names);
+        return new SolutionProgramLine(words, names);
     }
 
     private final List<String> words;
@@ -163,7 +163,7 @@ public class SolutionRow {
 
     private final Map<String, Integer> wordCounts;
 
-    public SolutionRow(List<String> words, List<String> names) {
+    public SolutionProgramLine(List<String> words, List<String> names) {
         this.words = words;
         this.names = names;
 
@@ -174,7 +174,7 @@ public class SolutionRow {
         }
     }
 
-    double calculateSimilarity(SolutionRow other) {
+    public double calculateSimilarity(SolutionProgramLine other) {
         int total = 0;
         int both = 0;
 

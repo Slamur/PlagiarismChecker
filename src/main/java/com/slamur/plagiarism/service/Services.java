@@ -1,11 +1,13 @@
 package com.slamur.plagiarism.service;
 
+import com.slamur.plagiarism.model.parsing.contest.EjudgeContest;
 import com.slamur.plagiarism.service.impl.ComparisonService;
-import com.slamur.plagiarism.service.impl.SamaraContestService;
+import com.slamur.plagiarism.service.impl.ContestServiceImpl;
 import com.slamur.plagiarism.service.impl.CredentialsService;
 import com.slamur.plagiarism.service.impl.FxmlStageService;
 import com.slamur.plagiarism.service.impl.PropertiesService;
 import com.slamur.plagiarism.service.impl.VerificationService;
+import com.slamur.plagiarism.service.impl.contest.EjudgeLocalContestLoader;
 
 public class Services {
 
@@ -30,7 +32,7 @@ public class Services {
 
     public static CredentialsService credentials() { return instance.credentialsService; }
 
-    public static SamaraContestService contest() {
+    public static ContestService contest() {
         return instance.contestService;
     }
 
@@ -45,7 +47,7 @@ public class Services {
     private final FxmlStageService fxmlService;
     private final PropertiesService propertiesService;
     private final CredentialsService credentialsService;
-    private final SamaraContestService contestService;
+    private final ContestService contestService;
     private final ComparisonService comparisonService;
     private final VerificationService verificationService;
 
@@ -53,7 +55,9 @@ public class Services {
         this.fxmlService = new FxmlStageService();
         this.propertiesService = new PropertiesService();
         this.credentialsService = new CredentialsService();
-        this.contestService = new SamaraContestService();
+        this.contestService = new ContestServiceImpl(
+                EjudgeLocalContestLoader.forLocal(EjudgeContest.KOTECH_2021)
+        );
         this.comparisonService = new ComparisonService();
         this.verificationService = new VerificationService();
     }

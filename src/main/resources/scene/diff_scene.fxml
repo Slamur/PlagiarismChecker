@@ -18,8 +18,13 @@
         </HBox>
 
         <HBox spacing="10.0">
-            <CheckBox fx:id="useParticipantFilterCheckBox" text="Использовать фильтр по ID"/>
+            <CheckBox fx:id="useParticipantFilterCheckBox" text="Фильтр по пользователю (id)"/>
             <TextField fx:id="participantIdFilterTextField"/>
+        </HBox>
+
+        <HBox spacing="10.0">
+            <CheckBox fx:id="useSolutionFilterCheckBox" text="Фильтр по решению (id)"/>
+            <TextField fx:id="solutionIdFilterTextField"/>
         </HBox>
 
         <HBox spacing="10.0">

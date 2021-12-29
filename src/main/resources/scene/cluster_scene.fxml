@@ -18,11 +18,11 @@
     <Button fx:id="saveCommentButton" text="Сохранить комментарий"
             GridPane.columnIndex="3" GridPane.rowIndex="1"/>
 
-    <ListView fx:id="leftParticipantListView"
+    <ListView fx:id="leftSolutionListView"
               GridPane.columnIndex="2" GridPane.rowIndex="2"
               GridPane.rowSpan="2"/>
 
-    <ListView fx:id="rightParticipantListView"
+    <ListView fx:id="rightSolutionListView"
               GridPane.columnIndex="4" GridPane.rowIndex="2"
               GridPane.rowSpan="2"/>
 
