@@ -28,6 +28,12 @@
         </HBox>
 
         <HBox spacing="10.0">
+            <Label text="Авто: мин. проблем"/>
+            <Spinner fx:id="minAutoPlagiatProblemsSpinner"/>
+            <Button fx:id="runAutoPlagiatButton" text="Запустить"/>
+        </HBox>
+
+        <HBox spacing="10.0">
             <CheckBox fx:id="useClusterFilterCheckBox" text="Фильтр по кластерам"/>
             <Button fx:id="filterComparisonsButton" text="Применить фильтры"/>
         </HBox>
