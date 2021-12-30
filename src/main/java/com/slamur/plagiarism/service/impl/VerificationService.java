@@ -230,7 +230,7 @@ public class VerificationService extends ServiceBase {
             out.println(comparisonToStatus.size());
 
             for (var comparisonStatusEntry : comparisonToStatus.entrySet()) {
-                out.println(comparisonStatusEntry.getKey() + "\t" + comparisonStatusEntry.getValue());
+                out.println(comparisonStatusEntry.getKey().toText() + "\t" + comparisonStatusEntry.getValue());
             }
 
             out.println(Cluster.SEPARATOR);

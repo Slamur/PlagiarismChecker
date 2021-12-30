@@ -18,13 +18,17 @@ public class Comparison {
         return left.problemName;
     }
 
-    @Override
-    public String toString() {
+    public String toText() {
         return String.format(
                 "%s (%s) - %s (%s)",
                 left.id, left.getParticipant().login,
                 right.id, right.getParticipant().login
         );
+    }
+
+    @Override
+    public String toString() {
+        return left.id + " - " + right.id;
     }
 
     @Override
