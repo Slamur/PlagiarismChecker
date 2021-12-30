@@ -28,7 +28,7 @@ public class Comparison {
 
     @Override
     public String toString() {
-        return left.id + " - " + right.id;
+        return toIds().toString();
     }
 
     @Override
