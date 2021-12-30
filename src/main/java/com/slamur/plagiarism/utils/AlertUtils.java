@@ -30,6 +30,8 @@ public class AlertUtils {
 
     public static void alert(Alert.AlertType alertType, String message, Exception e) {
         alert(alertType, message + ": " + e.getMessage());
+
+        e.printStackTrace();
     }
 
     public static void alert(Alert.AlertType alertType, String message) {
