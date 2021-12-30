@@ -6,7 +6,11 @@
 <GridPane alignment="center" hgap="10" vgap="10" xmlns="http://javafx.com/javafx/11.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.slamur.plagiarism.controller.impl.DiffController">
 
     <VBox fx:id="comparisonsVBox" spacing="20.0" GridPane.columnIndex="0" GridPane.rowIndex="0" GridPane.rowSpan="6">
-        <ListView fx:id="comparisonsListView"/>
+        <HBox>
+            <ListView fx:id="participantPairsListView"/>
+
+            <ListView fx:id="comparisonsListView"/>
+        </HBox>
 
         <HBox fx:id="problemFiltersHBox" spacing="20.0"/>
 
