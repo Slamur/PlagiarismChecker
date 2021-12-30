@@ -317,19 +317,6 @@ public class DiffController extends TabController {
         }
     }
 
-    private int updateComparisonsListView(Comparison comparison,
-                                           Status status) {
-        return 1;
-
-        // FIXME
-//        if (!statusToFilter.get(status).isSelected()) {
-////            comparisonsListView.getItems().remove(comparison);
-//            return 0;
-//        } else {
-//            return 1;
-//        }
-    }
-
     private void updateComparisonsListView() {
         double minSimilarity = minSimilaritySpinner.getValue();
 
@@ -528,27 +515,25 @@ public class DiffController extends TabController {
         ignoreButton.setOnAction(this::ignoreAction);
     }
 
-    private int updateStatus(Status status) {
+    private void updateStatus(Status status) {
         Services.verification().setStatus(comparison, status);
         comparisonStatusLabel.setText(status.text);
-        int shift = updateComparisonsListView(comparison, status);
         selectComparison(comparisonIndex);
-        return shift;
     }
 
     public void plagiatAction(ActionEvent event) {
-        int shift = updateStatus(Status.PLAGIAT);
-        move(shift);
+        updateStatus(Status.PLAGIAT);
+        moveNext();
     }
 
     public void unknownAction(ActionEvent event) {
-        int shift = updateStatus(Status.UNKNOWN);
-        move(shift);
+        updateStatus(Status.UNKNOWN);
+        moveNext();
     }
 
     public void ignoreAction(ActionEvent event) {
-        int shift = updateStatus(Status.IGNORED);
-        move(shift);
+        updateStatus(Status.IGNORED);
+        moveNext();
     }
 
     public void goToClusterAction(ActionEvent event) {
