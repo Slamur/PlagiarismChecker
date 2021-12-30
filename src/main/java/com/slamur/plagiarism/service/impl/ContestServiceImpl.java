@@ -122,9 +122,9 @@ public class ContestServiceImpl extends ServiceBase implements ContestService {
                 var solutions = participantRepository.loadSolutions(contestLoader);
                 solutionsByParticipant.put(participant, solutions);
             } catch (Exception e) {
-                e.printStackTrace();
                 AlertUtils.error(
-                        String.format("Ошибка при загрузке информации и решений участника %s", participant.login)
+                        String.format("Ошибка при загрузке информации и решений участника %s", participant.login),
+                        e
                 );
             }
         }
