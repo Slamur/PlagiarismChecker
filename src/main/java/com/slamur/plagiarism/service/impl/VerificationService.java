@@ -295,7 +295,8 @@ public class VerificationService extends ServiceBase {
 
             Solution solution = idToSolution.get(solutionId);
             if (null == solution) {
-                throw new IOException("Кластер привязан к неизвестному решению: " + clusterInfoLine);
+                //throw new IOException("Кластер привязан к неизвестному решению: " + clusterInfoLine);
+                continue;
             }
 
             Cluster cluster = getCluster(solution);
