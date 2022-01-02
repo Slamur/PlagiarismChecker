@@ -67,7 +67,10 @@ public class ParticipantSolutions {
             Predicate<Solution> isPlagiatPredicate
     ) {
         if (allSolutions.isEmpty()) {
-            throw new UnsupportedOperationException("Участия не было");
+            return new ParticipantResult(
+                    null,
+                    Collections.emptyMap()
+            );
         }
 
         var participant = allSolutions.stream().findFirst()
@@ -115,6 +118,8 @@ public class ParticipantSolutions {
                                     problemName.equals(otherSolution.getProblemName())
                             ).filter(otherSolution ->
                                     otherSolution.getDateTime().compareTo(solution.getDateTime()) < 0
+                            ).filter(otherSolution ->
+                                    !otherSolution.verdict.equals(Verdict.CE)
                             ).count();
 
                     long timeMinutes = DateTimeUtils.toCeilingMinutes(time);

@@ -7,6 +7,7 @@ public enum Verdict {
     AC(List.of("OK", "AC", "Accepted")),
     WA(List.of("WA", "Wrong answer")),
     TL(List.of("TL", "Time-limit exceeded")),
+    ML(List.of("ML", "Memory limit exceeded")),
     RE(List.of("RE", "RT", "Run-time error")),
     CE(List.of("CE", "Compilation error")),
     PE(List.of("PE", "Presentation error")),

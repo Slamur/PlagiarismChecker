@@ -136,12 +136,14 @@ public class ContestServiceImpl extends ServiceBase implements ContestService {
 
         return solutionsByParticipant.values().stream()
                 .map(solutions -> solutions.getParticipantResults(contest, verificication::isPlagiat))
+                .filter(participantResult -> !participantResult.getProblemResults().isEmpty())
                 .collect(Collectors.toList());
     }
 
     private void saveParticipants() {
         var sortedLogins = participants.stream()
                 .map(Participant::getLogin)
+                .filter(login -> List.of("ejudge", "INVALID").stream().noneMatch(login::contains))
                 .map(login -> {
                     var type = login.charAt(0);
                     var number = Integer.parseInt(login.substring(1 + "User".length()));
