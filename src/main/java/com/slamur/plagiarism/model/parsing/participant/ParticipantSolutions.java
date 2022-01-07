@@ -48,6 +48,12 @@ public class ParticipantSolutions {
                 ? new ArrayList<>(problemToBestSolution.values())
                 : allSolutions;
 
+        resultSolutions.addAll(
+                allSolutions.stream()
+                        .filter(solution -> Verdict.DISQUALIFIED.equals(solution.verdict))
+                        .collect(Collectors.toList())
+        );
+
         var problemsCount = resultSolutions.stream()
                 .map(Solution::getProblemName)
                 .distinct()
