@@ -48,6 +48,12 @@ public class ParticipantSolutions {
                 ? new ArrayList<>(problemToBestSolution.values())
                 : allSolutions;
 
+        resultSolutions.addAll(
+                allSolutions.stream()
+                        .filter(solution -> Verdict.DISQUALIFIED.equals(solution.verdict))
+                        .collect(Collectors.toList())
+        );
+
         var problemsCount = resultSolutions.stream()
                 .map(Solution::getProblemName)
                 .distinct()
@@ -67,7 +73,10 @@ public class ParticipantSolutions {
             Predicate<Solution> isPlagiatPredicate
     ) {
         if (allSolutions.isEmpty()) {
-            throw new UnsupportedOperationException("Участия не было");
+            return new ParticipantResult(
+                    null,
+                    Collections.emptyMap()
+            );
         }
 
         var participant = allSolutions.stream().findFirst()
@@ -115,6 +124,8 @@ public class ParticipantSolutions {
                                     problemName.equals(otherSolution.getProblemName())
                             ).filter(otherSolution ->
                                     otherSolution.getDateTime().compareTo(solution.getDateTime()) < 0
+                            ).filter(otherSolution ->
+                                    !otherSolution.verdict.equals(Verdict.CE)
                             ).count();
 
                     long timeMinutes = DateTimeUtils.toCeilingMinutes(time);

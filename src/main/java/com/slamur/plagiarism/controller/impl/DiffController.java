@@ -2,6 +2,7 @@ package com.slamur.plagiarism.controller.impl;
 
 import java.net.URL;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
@@ -10,6 +11,7 @@ import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import com.slamur.plagiarism.model.IdsPair;
 import com.slamur.plagiarism.model.parsing.solution.Solution;
 import com.slamur.plagiarism.model.parsing.solution.Verdict;
 import com.slamur.plagiarism.model.verification.Cluster;
@@ -20,6 +22,8 @@ import com.slamur.plagiarism.utils.AlertUtils;
 import com.slamur.plagiarism.utils.FxmlUtils;
 import com.slamur.plagiarism.utils.StreamUtils;
 import javafx.application.Platform;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.geometry.Insets;
@@ -45,6 +49,8 @@ import javafx.scene.paint.Color;
 public class DiffController extends TabController {
 
     @FXML public VBox comparisonsVBox;
+
+    @FXML public ListView<IdsPair> participantPairsListView;
 
     @FXML public ListView<Comparison> comparisonsListView;
 
@@ -109,8 +115,16 @@ public class DiffController extends TabController {
     private int comparisonIndex;
     private Comparison comparison;
 
-    private Map<String, CheckBox> problemToFilter;
-    private EnumMap<Status, CheckBox> statusToFilter;
+    private final Map<String, CheckBox> problemToFilter;
+    private final EnumMap<Status, CheckBox> statusToFilter;
+
+    private final Map<IdsPair, ObservableList<Comparison>> participantsToComparisons;
+
+    public DiffController() {
+        this.problemToFilter = new HashMap<>();
+        this.statusToFilter = new EnumMap<>(Status.class);
+        this.participantsToComparisons = new HashMap<>();
+    }
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -200,17 +214,19 @@ public class DiffController extends TabController {
     private void initializeComparisonsFiltersPart() {
         var contest = Services.contest();
 
-        this.problemToFilter = contest.getProblems().stream()
+        var problemFilters = contest.getProblems().stream()
                 .collect(Collectors.toMap(
                         Function.identity(),
                         CheckBox::new
                 ));
 
+        problemToFilter.putAll(problemFilters);
+
         problemFiltersHBox.getChildren().addAll(
                 problemToFilter.values()
         );
 
-        this.statusToFilter = new EnumMap<>(Status.class);
+        statusToFilter.clear();
         for (Status status : Status.values()) {
             var statusFilter = new CheckBox(status.text);
             statusToFilter.put(status, statusFilter);
@@ -252,6 +268,22 @@ public class DiffController extends TabController {
             })
         );
 
+        initializeParticipantPairsListViewSelectionModel();
+
+        initializeComparisonsListViewSelectionModel();
+    }
+
+    private void initializeParticipantPairsListViewSelectionModel() {
+        var selectionModel = participantPairsListView.getSelectionModel();
+
+        selectionModel.setSelectionMode(SelectionMode.SINGLE);
+        selectionModel.selectedIndexProperty().addListener(
+                (observableValue, oldParticipantPairsIndex, newParticipantPairsIndex)
+                        -> selectParticipantPairs(newParticipantPairsIndex.intValue())
+        );
+    }
+
+    private void initializeComparisonsListViewSelectionModel() {
         var selectionModel = comparisonsListView.getSelectionModel();
 
         selectionModel.setSelectionMode(SelectionMode.SINGLE);
@@ -317,19 +349,6 @@ public class DiffController extends TabController {
         }
     }
 
-    private int updateComparisonsListView(Comparison comparison,
-                                           Status status) {
-        return 1;
-
-        // FIXME
-//        if (!statusToFilter.get(status).isSelected()) {
-////            comparisonsListView.getItems().remove(comparison);
-//            return 0;
-//        } else {
-//            return 1;
-//        }
-    }
-
     private void updateComparisonsListView() {
         double minSimilarity = minSimilaritySpinner.getValue();
 
@@ -379,9 +398,23 @@ public class DiffController extends TabController {
     }
 
     private void updateComparisonsListView(Predicate<Comparison> predicate) {
-        comparisonsListView.setItems(
-                Services.comparisons().filtered(predicate)
+        var filteredComparisons = Services.comparisons().filtered(predicate);
+
+        participantsToComparisons.clear();
+        filteredComparisons.forEach(curComparison -> {
+            var participants = curComparison.toParticipantIds();
+            var participantsComparisons = participantsToComparisons.computeIfAbsent(
+                    participants,
+                    (ids) -> FXCollections.observableArrayList()
+            );
+
+            participantsComparisons.add(curComparison);
+        });
+
+        participantPairsListView.setItems(
+                FXCollections.observableArrayList(participantsToComparisons.keySet())
         );
+        participantPairsListView.getSelectionModel().selectFirst();
     }
 
     public void fullSelectComparison(Optional<Comparison> selectedComparison) {
@@ -391,6 +424,20 @@ public class DiffController extends TabController {
         comparisonsListView.getSelectionModel().select(
                 selectedComparison.orElse(items.get(0))
         );
+    }
+
+    private void selectParticipantPairs(int participantPairsIndex) {
+        if (participantPairsIndex < 0 || participantPairsListView.getItems().size() <= participantPairsIndex) return;
+
+        var participantsPair = participantPairsListView.getItems().get(participantPairsIndex);
+
+        comparisonsListView.setItems(
+                participantsToComparisons.get(participantsPair)
+        );
+
+        if (comparisonsListView.getItems().size() > 0) {
+            selectComparison(0);
+        }
     }
 
     private void selectComparison(int comparisonIndex) {
@@ -528,27 +575,25 @@ public class DiffController extends TabController {
         ignoreButton.setOnAction(this::ignoreAction);
     }
 
-    private int updateStatus(Status status) {
+    private void updateStatus(Status status) {
         Services.verification().setStatus(comparison, status);
         comparisonStatusLabel.setText(status.text);
-        int shift = updateComparisonsListView(comparison, status);
         selectComparison(comparisonIndex);
-        return shift;
     }
 
     public void plagiatAction(ActionEvent event) {
-        int shift = updateStatus(Status.PLAGIAT);
-        move(shift);
+        updateStatus(Status.PLAGIAT);
+        moveNext();
     }
 
     public void unknownAction(ActionEvent event) {
-        int shift = updateStatus(Status.UNKNOWN);
-        move(shift);
+        updateStatus(Status.UNKNOWN);
+        moveNext();
     }
 
     public void ignoreAction(ActionEvent event) {
-        int shift = updateStatus(Status.IGNORED);
-        move(shift);
+        updateStatus(Status.IGNORED);
+        moveNext();
     }
 
     public void goToClusterAction(ActionEvent event) {

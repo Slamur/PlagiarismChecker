@@ -230,7 +230,7 @@ public class VerificationService extends ServiceBase {
             out.println(comparisonToStatus.size());
 
             for (var comparisonStatusEntry : comparisonToStatus.entrySet()) {
-                out.println(comparisonStatusEntry.getKey() + "\t" + comparisonStatusEntry.getValue());
+                out.println(comparisonStatusEntry.getKey().toText() + "\t" + comparisonStatusEntry.getValue());
             }
 
             out.println(Cluster.SEPARATOR);
@@ -295,7 +295,8 @@ public class VerificationService extends ServiceBase {
 
             Solution solution = idToSolution.get(solutionId);
             if (null == solution) {
-                throw new IOException("Кластер привязан к неизвестному решению: " + clusterInfoLine);
+                //throw new IOException("Кластер привязан к неизвестному решению: " + clusterInfoLine);
+                continue;
             }
 
             Cluster cluster = getCluster(solution);
