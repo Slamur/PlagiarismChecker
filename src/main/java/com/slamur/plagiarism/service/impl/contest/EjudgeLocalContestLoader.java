@@ -1,16 +1,20 @@
 package com.slamur.plagiarism.service.impl.contest;
 
 import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import com.slamur.plagiarism.model.parsing.contest.Contest;
@@ -205,7 +209,37 @@ public class EjudgeLocalContestLoader implements ContestLoader {
 
     @Override
     public Set<Participant> loadParticipants(Contest contest) {
-        return participantsInfo.keySet().stream()
+        var dumpParticipants = new HashSet<>(participantsInfo.keySet());
+
+        var directoryParticipants = IOUtils.getFiles(localDirectory).stream()
+                .filter(File::isDirectory)
+                .map(File::getName)
+                .collect(Collectors.toSet());
+
+        try {
+            IOUtils.saveToFile(new File("missed.txt"), (out) -> {
+                directoryParticipants.stream()
+                        .filter(Predicate.not(dumpParticipants::contains))
+                        .sorted()
+                        .map(login -> new Participant(login, contest))
+                        .forEach(participant -> {
+                            out.println("Login = " + participant.login);
+                            out.println("Solution ids: ");
+                            getSolutionsWithCode(participant).values().stream()
+                                .map(Solution::getId)
+                                .forEach(out::println);
+                            out.println("==========================");
+                        });
+            });
+        } catch (FileNotFoundException | UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+
+        var allParticipants = new HashSet<String>();
+        allParticipants.addAll(dumpParticipants);
+//        allParticipants.addAll(directoryParticipants);
+
+        return allParticipants.stream()
                 .map(login -> new Participant(login, contest))
                 .collect(Collectors.toSet());
     }
@@ -228,14 +262,10 @@ public class EjudgeLocalContestLoader implements ContestLoader {
         }
     }
 
-    @Override
-    public ParticipantSolutions loadSolutions(Participant participant) {
+    private Map<Integer, Solution> getSolutionsWithCode(Participant participant) {
         Map<Integer, Solution> solutionsWithCode = new HashMap<>();
 
         File participantDirectory = new File(localDirectory, participant.login);
-        if (!participantDirectory.exists()) {
-            return new ParticipantSolutions();
-        }
 
         IOUtils.getFiles(participantDirectory).forEach(solutionFile -> {
             try {
@@ -296,6 +326,13 @@ public class EjudgeLocalContestLoader implements ContestLoader {
                 throw e;
             }
         });
+
+        return solutionsWithCode;
+    }
+
+    @Override
+    public ParticipantSolutions loadSolutions(Participant participant) {
+        var solutionsWithCode = getSolutionsWithCode(participant);
 
         var participantSolutions = new ParticipantSolutions();
 
