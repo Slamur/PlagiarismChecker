@@ -36,11 +36,11 @@ public class SamaraContestLoader implements ContestLoader {
 
     private static final String HREF_TAG_NAME = "href";
 
-    public static final String DOMAIN = "http://contest.samsu.ru/ru/";
+    public static final String DOMAIN = "http://contest.samsu.ru";//"http://contest.samsu.ru/ru/";
     private static final String USER_AGENT = "Mozilla/5.0";
 
-    public static final String PROFILE_PREFIX = "viewprofile";
-    public static final String SOLUTION_PREFIX = "solution";
+    public static final String PROFILE_PREFIX = "/ru/viewprofile";
+    public static final String SOLUTION_PREFIX = "/ru/solution";
 
     private static class SamaraContestRequestProcessor {
 
@@ -60,7 +60,7 @@ public class SamaraContestLoader implements ContestLoader {
         }
 
         public String monitor(Contest contest) throws IOException {
-            return get("monitorvseros/" + contest.getId() + "/1");
+            return get("/ru/monitorvseros/" + contest.getId() + "/1");
         }
     }
 
@@ -94,7 +94,7 @@ public class SamaraContestLoader implements ContestLoader {
     private final SamaraContestRequestProcessor requestProcessor;
     private final Map<Participant, ParticipantPageHolder> participantPageHolders;
 
-    private SamaraContestLoader(SamaraContest contest) {
+    public SamaraContestLoader(SamaraContest contest) {
         this.contest = contest;
         this.requestProcessor = new SamaraContestRequestProcessor();
         this.participantPageHolders = new HashMap<>();
@@ -105,8 +105,12 @@ public class SamaraContestLoader implements ContestLoader {
         return contest;
     }
 
+    public static String getFullLinkWithDomain(Participant participant) {
+        return DOMAIN + getFullLink(participant);
+    }
+
     public static String getFullLink(Participant participant) {
-        return DOMAIN + PROFILE_PREFIX + "/" + participant.login + "/all";
+        return PROFILE_PREFIX + "/" + participant.login + "/all";
     }
 
     public static String getFullLink(Solution solution) {
@@ -211,7 +215,8 @@ public class SamaraContestLoader implements ContestLoader {
         Element problemNameElement = submitElement.getElementsByAttributeValueContaining(HREF_TAG_NAME, "problemset").first();
 
         String problemName = problemNameElement.text();
-        if (!problemName.matches("[A-Z].*")) return Optional.empty();
+        // FIXME later
+        if (!problemName.matches("[A-Z].*") && !problemName.matches("[1-9].*")) return Optional.empty();
 
         var contest = participant.getContest();
 
@@ -282,7 +287,7 @@ public class SamaraContestLoader implements ContestLoader {
                     return fullLanguageLine.substring(space + 1);
                 }).orElse("UNKNOWN");
 
-        Language language = Language.fromExtension(languageString);
+        Language language = Language.fromAlias(languageString);
 
         Element codeElement = submitPage.getElementsByTag("code").first();
 

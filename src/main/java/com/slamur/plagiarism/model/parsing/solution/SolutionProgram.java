@@ -38,6 +38,7 @@ public class SolutionProgram {
         String parsedCode = code;
 
         final char single = 1, multiStart = 2, multiEnd = 3, newLine = '\n', multiEqual = 4;
+        if (!parsedCode.endsWith("" + newLine)) parsedCode += newLine;
 
         if (!language.singleLineCommentStart.isEmpty()) {
             parsedCode = parsedCode.replaceAll(language.singleLineCommentStart, "" + single);

@@ -13,7 +13,23 @@ public class SamaraContest extends Contest {
 
     private static final String SCHOOL = "sch", CITY = "okrug", REGION = "vseros";
 
-    public static final Contest OKRUG_2020 = new SamaraContest(
+    public static final SamaraContest REGION_2021_2 = new SamaraContest(
+            REGION, 592,
+            LocalDate.of(2022, 1, 17),
+            LocalTime.of(9, 0),
+            LocalTime.of(14, 0),
+            problemsRange('5', '8')
+    );
+
+    public static final SamaraContest REGION_2021_1 = new SamaraContest(
+            REGION, 591,
+            LocalDate.of(2022, 1, 15),
+            LocalTime.of(10, 0),
+            LocalTime.of(15, 0),
+            problemsRange('1', '4')
+    );
+
+    public static final SamaraContest OKRUG_2020 = new SamaraContest(
             CITY, 579,
             LocalDate.of(2020, 11, 21),
             LocalTime.of(10, 0),
@@ -21,7 +37,7 @@ public class SamaraContest extends Contest {
             problemsRange('A', 'E')
     );
 
-    public static final Contest REGION_2020_1 = new SamaraContest(
+    public static final SamaraContest REGION_2020_1 = new SamaraContest(
             REGION, 581,
             LocalDate.of(2021, 1, 16),
             LocalTime.of(10, 35),
@@ -29,7 +45,7 @@ public class SamaraContest extends Contest {
             problemsRange('A', 'D')
     );
 
-    public static final Contest REGION_2020_2 = new SamaraContest(
+    public static final SamaraContest REGION_2020_2 = new SamaraContest(
             REGION, 583,
             LocalDate.of(2021, 1, 18),
             LocalTime.of(10, 0),
@@ -37,7 +53,7 @@ public class SamaraContest extends Contest {
             problemsRange('E', 'H')
     );
 
-    public static final Contest OKRUG_2021 = new SamaraContest(
+    public static final SamaraContest OKRUG_2021 = new SamaraContest(
             CITY, 588,
             LocalDate.of(2021, 11, 27),
             LocalTime.of(10, 0),
@@ -64,7 +80,7 @@ public class SamaraContest extends Contest {
 
     @Override
     public String toText(Participant participant) {
-        return SamaraContestLoader.getFullLink(participant);
+        return SamaraContestLoader.getFullLinkWithDomain(participant);
     }
 
     @Override

@@ -15,7 +15,9 @@ public class RequestUtils {
                                  String domain, 
                                  Map<String, String> parameters, 
                                  Map<String, String> cookies) throws IOException {
-        URL obj = new URL(domain + url);
+        if (!url.startsWith("/")) url = "/" + url;
+        if (!url.startsWith(domain)) url = domain + url;
+        URL obj = new URL(url);
         HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 
         //add request header
