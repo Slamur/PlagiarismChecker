@@ -134,9 +134,16 @@ public class ContestServiceImpl extends ServiceBase implements ContestService {
     private List<ParticipantResult> calculateResults() {
         var verificication = Services.verification();
 
+        // FIXME later
         return solutionsByParticipant.values().stream()
                 .map(solutions -> solutions.getParticipantResults(contest, verificication::isPlagiat))
                 .filter(participantResult -> !participantResult.getProblemResults().isEmpty())
+                .filter(participantResult -> !participantResult.getParticipant().login.contains("INVALID TEAM"))
+                .filter(participantResult -> !participantResult.getParticipant().login.contains("ejudge"))
+                .filter(participantResult -> !participantResult.getParticipant().id.equals("CUser1415"))
+                .filter(participantResult -> !participantResult.getParticipant().id.equals("CUser1289"))
+                .filter(participantResult -> !participantResult.getParticipant().id.equals("AUser1662"))
+                .filter(participantResult -> !participantResult.getParticipant().id.equals("DUser113"))
                 .collect(Collectors.toList());
     }
 
