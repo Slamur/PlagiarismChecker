@@ -16,8 +16,8 @@ public class SamaraContest extends Contest {
     public static final SamaraContest REGION_2021_2 = new SamaraContest(
             REGION, 592,
             LocalDate.of(2022, 1, 17),
-            LocalTime.of(9, 0),
-            LocalTime.of(14, 0),
+            LocalTime.of(9, 10),
+            LocalTime.of(14, 10),
             problemsRange('5', '8')
     );
 

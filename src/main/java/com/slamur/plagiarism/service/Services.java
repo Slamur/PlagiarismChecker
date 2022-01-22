@@ -60,6 +60,7 @@ public class Services {
         this.contestService = new ContestServiceImpl(
 //                EjudgeLocalContestLoader.forLocal(EjudgeContest.KOTECH_2021)
                 new SamaraContestLoader(SamaraContest.REGION_2021_1)
+//                new SamaraContestLoader(SamaraContest.REGION_2021_2)
         );
         this.comparisonService = new ComparisonService();
         this.verificationService = new VerificationService();
