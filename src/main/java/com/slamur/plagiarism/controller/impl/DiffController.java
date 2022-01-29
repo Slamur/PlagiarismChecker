@@ -60,9 +60,13 @@ public class DiffController extends TabController {
 
     @FXML public Spinner<Double> minSimilaritySpinner;
 
-    @FXML public CheckBox useParticipantFilterCheckBox;
+    @FXML public CheckBox useFirstParticipantFilterCheckBox;
 
-    @FXML public TextField participantIdFilterTextField;
+    @FXML public TextField firstParticipantIdFilterTextField;
+
+    @FXML public CheckBox useSecondParticipantFilterCheckBox;
+
+    @FXML public TextField secondParticipantIdFilterTextField;
 
     @FXML public CheckBox useSolutionFilterCheckBox;
 
@@ -245,7 +249,7 @@ public class DiffController extends TabController {
                 )
         );
 
-        participantIdFilterTextField.setEditable(true);
+        firstParticipantIdFilterTextField.setEditable(true);
 
         clusterFiltersListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
 
@@ -365,6 +369,28 @@ public class DiffController extends TabController {
         }
     }
 
+    private Predicate<Comparison> getParticipantFilter() {
+        boolean useFirstParticipant = useFirstParticipantFilterCheckBox.isSelected();
+        boolean useSecondParticipant = useSecondParticipantFilterCheckBox.isSelected();
+
+        if (useFirstParticipant && useSecondParticipant) {
+            return Services.comparisons().withParticipants(
+                    firstParticipantIdFilterTextField.getText(),
+                    secondParticipantIdFilterTextField.getText()
+            );
+        } else if (useFirstParticipant) {
+            return Services.comparisons().withParticipant(
+                    firstParticipantIdFilterTextField.getText()
+            );
+        } else if (useSecondParticipant) {
+            return Services.comparisons().withParticipant(
+                    secondParticipantIdFilterTextField.getText()
+            );
+        } else {
+            return (comparison) -> true;
+        }
+    }
+
     private void updateComparisonsListView() {
         double minSimilarity = minSimilaritySpinner.getValue();
 
@@ -388,9 +414,7 @@ public class DiffController extends TabController {
                 )
                 : (comparison) -> true;
 
-        Predicate<Comparison> participantFilter = useParticipantFilterCheckBox.isSelected()
-                ? comparisons.withParticipant(participantIdFilterTextField.getText())
-                : (comparison) -> true;
+        Predicate<Comparison> participantFilter = getParticipantFilter();
 
         Predicate<Comparison> solutionFilter = useSolutionFilterCheckBox.isSelected()
                 ? comparisons.withSolution(solutionIdFilterTextField.getText())

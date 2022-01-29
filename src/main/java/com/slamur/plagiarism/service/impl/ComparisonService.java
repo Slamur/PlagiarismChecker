@@ -219,6 +219,12 @@ public class ComparisonService extends ServiceBase {
                 || comparison.right.getParticipant().id.equals(participantId);
     }
 
+    public Predicate<Comparison> withParticipants(String firstParticipantId, String secondParticipantId) {
+        var participants = new IdsPair(firstParticipantId, secondParticipantId);
+        return (comparison) ->
+                participants.equals(comparison.toParticipantIds());
+    }
+
     public Predicate<Comparison> withSolution(String solutionId) {
         return (comparison) ->
                 comparison.left.id.equals(solutionId) || comparison.right.id.equals(solutionId);
