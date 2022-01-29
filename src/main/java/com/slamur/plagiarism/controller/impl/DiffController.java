@@ -72,8 +72,6 @@ public class DiffController extends TabController {
 
     @FXML public TextField solutionIdFilterTextField;
 
-    @FXML public CheckBox useClusterFilterCheckBox;
-
     @FXML public ListView<Cluster> clusterFiltersListView;
 
     @FXML public ListView<String> ipFiltersListView;
@@ -126,12 +124,14 @@ public class DiffController extends TabController {
 
     private final Map<IdsPair, ObservableList<Comparison>> participantsToComparisons;
     private final Map<String, ObservableList<Comparison>> ipToComparisons;
+    private final Map<Cluster, ObservableList<Comparison>> clusterToComparisons;
 
     public DiffController() {
         this.problemToFilter = new HashMap<>();
         this.statusToFilter = new EnumMap<>(Status.class);
         this.participantsToComparisons = new HashMap<>();
         this.ipToComparisons = new HashMap<>();
+        this.clusterToComparisons = new HashMap<>();
     }
 
     @Override
@@ -251,15 +251,6 @@ public class DiffController extends TabController {
 
         firstParticipantIdFilterTextField.setEditable(true);
 
-        clusterFiltersListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
-
-        Services.verification().afterInitialization(() -> Platform.runLater(
-                () -> clusterFiltersListView.setItems(
-                    Services.verification().getClusters()
-                )
-            )
-        );
-
         filterComparisonsButton.setOnAction(actionEvent -> updateComparisonsListView());
 
         problemToFilter.values().forEach(filter -> filter.setSelected(true));
@@ -276,11 +267,25 @@ public class DiffController extends TabController {
             })
         );
 
+        initializeComparisonsListViewSelectionModel();
+
         initializeParticipantPairsListViewSelectionModel();
 
         initializeIpListViewSelectionModel();
 
-        initializeComparisonsListViewSelectionModel();
+        initializeClustersListViewSelectionModel();
+    }
+
+    private void initializeComparisonsListViewSelectionModel() {
+        var selectionModel = comparisonsListView.getSelectionModel();
+
+        selectionModel.setSelectionMode(SelectionMode.SINGLE);
+        selectionModel.selectedIndexProperty().addListener(
+                (observableValue, oldComparisonIndex, newComparisonIndex)
+                        -> selectComparison(newComparisonIndex.intValue())
+        );
+
+        comparisonsListView.setCellFactory(comparisonListView -> new ComparisonListCell());
     }
 
     private void initializeParticipantPairsListViewSelectionModel() {
@@ -303,16 +308,14 @@ public class DiffController extends TabController {
         );
     }
 
-    private void initializeComparisonsListViewSelectionModel() {
-        var selectionModel = comparisonsListView.getSelectionModel();
+    private void initializeClustersListViewSelectionModel() {
+        var selectionModel = clusterFiltersListView.getSelectionModel();
 
         selectionModel.setSelectionMode(SelectionMode.SINGLE);
         selectionModel.selectedIndexProperty().addListener(
-                (observableValue, oldComparisonIndex, newComparisonIndex)
-                        -> selectComparison(newComparisonIndex.intValue())
+                (observableValue, oldIpIndex, newIpIndex)
+                        -> selectCluster(newIpIndex.intValue())
         );
-
-        comparisonsListView.setCellFactory(comparisonListView -> new ComparisonListCell());
     }
 
     private static class ComparisonListCell extends TextFieldListCell<Comparison> {
@@ -408,12 +411,6 @@ public class DiffController extends TabController {
         var comparisons = Services.comparisons();
         var verification = Services.verification();
 
-        Predicate<Comparison> clusterFilter = useClusterFilterCheckBox.isSelected()
-                ? verification.fromCluster(
-                        clusterFiltersListView.getSelectionModel().getSelectedItems()
-                )
-                : (comparison) -> true;
-
         Predicate<Comparison> participantFilter = getParticipantFilter();
 
         Predicate<Comparison> solutionFilter = useSolutionFilterCheckBox.isSelected()
@@ -428,7 +425,6 @@ public class DiffController extends TabController {
                 comparisons.moreThan(minSimilarity),
                 comparisons.forProblem(expectedProblems),
                 verification.withStatus(expectedStatuses),
-                clusterFilter,
                 participantFilter,
                 solutionFilter,
                 atLeastOneAcFilter
@@ -473,7 +469,23 @@ public class DiffController extends TabController {
                 FXCollections.observableArrayList(ipToComparisons.keySet())
         );
 
-        //ipFiltersListView.getSelectionModel().selectFirst();
+        var clusters = Services.verification();
+
+        clusterToComparisons.clear();
+        filteredComparisons.forEach(curComparison ->
+            clusters.getCluster(curComparison).ifPresent(cluster -> {
+                var curClusterComparisons = clusterToComparisons.computeIfAbsent(
+                    cluster,
+                    (clusterKey) -> FXCollections.observableArrayList()
+                );
+
+                curClusterComparisons.add(curComparison);
+            })
+        );
+
+        clusterFiltersListView.setItems(
+                FXCollections.observableArrayList(clusterToComparisons.keySet())
+        );
     }
 
     public void fullSelectComparison(Optional<Comparison> selectedComparison) {
@@ -509,6 +521,20 @@ public class DiffController extends TabController {
         );
 
         if (ipFiltersListView.getItems().size() > 0) {
+            selectComparison(0);
+        }
+    }
+
+    private void selectCluster(int clusterIndex) {
+        if (clusterIndex < 0 || clusterFiltersListView.getItems().size() <= clusterIndex) return;
+
+        var cluster = clusterFiltersListView.getItems().get(clusterIndex);
+
+        comparisonsListView.setItems(
+                clusterToComparisons.get(cluster)
+        );
+
+        if (clusterFiltersListView.getItems().size() > 0) {
             selectComparison(0);
         }
     }
@@ -681,8 +707,6 @@ public class DiffController extends TabController {
 
         clusterFiltersSelectionModel.clearSelection();
         clusterFiltersSelectionModel.select(cluster);
-
-        useClusterFilterCheckBox.setSelected(true);
 
         problemToFilter.values().forEach(filter -> filter.setSelected(false));
         problemToFilter.get(cluster.getProblemName()).setSelected(true);

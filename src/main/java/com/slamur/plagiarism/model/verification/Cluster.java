@@ -262,4 +262,18 @@ public class Cluster {
     public Clique getClique(Solution solution) {
         return solutionToClique.get(solution);
     }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj) return true;
+        if (!(obj instanceof Cluster)) return false;
+
+        Cluster other = (Cluster) obj;
+        return this.toString().equals(other.toString());
+    }
+
+    @Override
+    public int hashCode() {
+        return toString().hashCode();
+    }
 }
