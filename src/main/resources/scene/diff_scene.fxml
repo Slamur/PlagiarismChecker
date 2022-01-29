@@ -37,6 +37,11 @@
         </HBox>
 
         <HBox spacing="10.0">
+            <CheckBox fx:id="useSubstringFilterCheckBox" text="Фильтр по подстроке"/>
+            <TextField fx:id="substringFilterTextField"/>
+        </HBox>
+
+        <HBox spacing="10.0">
             <Label text="Авто: мин. задач"/>
             <Spinner fx:id="minAutoPlagiatProblemsSpinner"/>
             <Button fx:id="runAutoPlagiatButton" text="Запустить"/>

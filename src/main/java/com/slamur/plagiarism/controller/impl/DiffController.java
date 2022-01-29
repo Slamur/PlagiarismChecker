@@ -72,6 +72,10 @@ public class DiffController extends TabController {
 
     @FXML public TextField solutionIdFilterTextField;
 
+    @FXML public CheckBox useSubstringFilterCheckBox;
+
+    @FXML public TextField substringFilterTextField;
+
     @FXML public ListView<Cluster> clusterFiltersListView;
 
     @FXML public ListView<String> ipFiltersListView;
@@ -417,6 +421,10 @@ public class DiffController extends TabController {
                 ? comparisons.withSolution(solutionIdFilterTextField.getText())
                 : (comparison) -> true;
 
+        Predicate<Comparison> substringFilter = useSubstringFilterCheckBox.isSelected()
+                ? comparisons.withSubstring(substringFilterTextField.getText())
+                : (comparison) -> true;
+
         Predicate<Comparison> atLeastOneAcFilter = (comparison) ->
                 Verdict.AC == comparison.left.verdict
                         || Verdict.AC == comparison.right.verdict;
@@ -427,6 +435,7 @@ public class DiffController extends TabController {
                 verification.withStatus(expectedStatuses),
                 participantFilter,
                 solutionFilter,
+                substringFilter,
                 atLeastOneAcFilter
         );
 

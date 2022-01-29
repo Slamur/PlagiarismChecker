@@ -229,5 +229,12 @@ public class ComparisonService extends ServiceBase {
         return (comparison) ->
                 comparison.left.id.equals(solutionId) || comparison.right.id.equals(solutionId);
     }
+
+    public Predicate<Comparison> withSubstring(String substring) {
+        return (comparison) ->
+                comparison.left.getProgram().code.contains(substring)
+                        &&
+                comparison.right.getProgram().code.contains(substring);
+    }
 }
 
