@@ -72,6 +72,8 @@ public class DiffController extends TabController {
 
     @FXML public ListView<Cluster> clusterFiltersListView;
 
+    @FXML public ListView<String> ipFiltersListView;
+
     @FXML public Button filterComparisonsButton;
 
     @FXML public TextArea leftParticipantInfoTextArea;
@@ -119,11 +121,13 @@ public class DiffController extends TabController {
     private final EnumMap<Status, CheckBox> statusToFilter;
 
     private final Map<IdsPair, ObservableList<Comparison>> participantsToComparisons;
+    private final Map<String, ObservableList<Comparison>> ipToComparisons;
 
     public DiffController() {
         this.problemToFilter = new HashMap<>();
         this.statusToFilter = new EnumMap<>(Status.class);
         this.participantsToComparisons = new HashMap<>();
+        this.ipToComparisons = new HashMap<>();
     }
 
     @Override
@@ -270,6 +274,8 @@ public class DiffController extends TabController {
 
         initializeParticipantPairsListViewSelectionModel();
 
+        initializeIpListViewSelectionModel();
+
         initializeComparisonsListViewSelectionModel();
     }
 
@@ -280,6 +286,16 @@ public class DiffController extends TabController {
         selectionModel.selectedIndexProperty().addListener(
                 (observableValue, oldParticipantPairsIndex, newParticipantPairsIndex)
                         -> selectParticipantPairs(newParticipantPairsIndex.intValue())
+        );
+    }
+
+    private void initializeIpListViewSelectionModel() {
+        var selectionModel = ipFiltersListView.getSelectionModel();
+
+        selectionModel.setSelectionMode(SelectionMode.SINGLE);
+        selectionModel.selectedIndexProperty().addListener(
+                (observableValue, oldIpIndex, newIpIndex)
+                        -> selectIp(newIpIndex.intValue())
         );
     }
 
@@ -415,6 +431,25 @@ public class DiffController extends TabController {
                 FXCollections.observableArrayList(participantsToComparisons.keySet())
         );
         participantPairsListView.getSelectionModel().selectFirst();
+
+        ipToComparisons.clear();
+        filteredComparisons.forEach(curComparison -> {
+            if (curComparison.left.ip.equals(curComparison.right.ip)) {
+                var ip = curComparison.left.ip;
+                var curIpComparisons = ipToComparisons.computeIfAbsent(
+                        ip,
+                        (ipKey) -> FXCollections.observableArrayList()
+                );
+
+                curIpComparisons.add(curComparison);
+            }
+        });
+
+        ipFiltersListView.setItems(
+                FXCollections.observableArrayList(ipToComparisons.keySet())
+        );
+
+        //ipFiltersListView.getSelectionModel().selectFirst();
     }
 
     public void fullSelectComparison(Optional<Comparison> selectedComparison) {
@@ -436,6 +471,20 @@ public class DiffController extends TabController {
         );
 
         if (comparisonsListView.getItems().size() > 0) {
+            selectComparison(0);
+        }
+    }
+
+    private void selectIp(int ipIndex) {
+        if (ipIndex < 0 || ipFiltersListView.getItems().size() <= ipIndex) return;
+
+        var ip = ipFiltersListView.getItems().get(ipIndex);
+
+        comparisonsListView.setItems(
+                ipToComparisons.get(ip)
+        );
+
+        if (ipFiltersListView.getItems().size() > 0) {
             selectComparison(0);
         }
     }

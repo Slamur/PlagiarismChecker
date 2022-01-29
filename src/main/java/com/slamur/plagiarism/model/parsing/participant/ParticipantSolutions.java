@@ -139,4 +139,23 @@ public class ParticipantSolutions {
                     );
                 }).orElse(ProblemResult.NOT_TRIED);
     }
+
+    public boolean hasDiffIps() {
+        for (Solution solution : allSolutions) {
+            for (Solution otherSolution : allSolutions) {
+                if (!solution.ip.equals(otherSolution.ip)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    @Override
+    public String toString() {
+        return allSolutions.stream().
+                map(solution -> solution.ip + "\t" + solution.getProblemName() + "\t" + solution.getDateTime() + "\t" + solution.verdict).
+                collect(Collectors.joining("\n"));
+    }
 }

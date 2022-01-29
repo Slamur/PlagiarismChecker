@@ -1,6 +1,5 @@
 package com.slamur.plagiarism.service.impl;
 
-import java.awt.Point;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -129,6 +128,19 @@ public class ContestServiceImpl extends ServiceBase implements ContestService {
             }
         }
 
+        saveDiffIps();
+    }
+
+    private void saveDiffIps() throws IOException {
+        IOUtils.saveToFile(new File(getContestRepository().getDirectory(), "different ips.txt"), (out) -> {
+            for (Participant participant : participants) {
+                var solutions = solutionsByParticipant.getOrDefault(participant, new ParticipantSolutions());
+                if (solutions.hasDiffIps()) {
+                    out.println(participant + " " + infoByParticipant.get(participant).name);
+                    out.println(solutions);
+                }
+            }
+        });
     }
 
     private List<ParticipantResult> calculateResults() {
@@ -146,15 +158,17 @@ public class ContestServiceImpl extends ServiceBase implements ContestService {
         var sortedLogins = participants.stream()
                 .map(Participant::getLogin)
                 .filter(login -> List.of("ejudge", "INVALID").stream().noneMatch(login::contains))
-                .map(login -> {
-                    var type = login.charAt(0);
-                    var number = Integer.parseInt(login.substring(1 + "User".length()));
-
-                    return new Point(type, number);
-                }).sorted((a, b) -> {
-                    if (a.x != b.x) return a.x - b.x;
-                    return a.y - b.y;
-                }).map(p -> "" + (char)p.x + "User" + p.y)
+                .sorted()
+//                .map(login -> {
+////                    var type = login.charAt(0);
+////                    var number = Integer.parseInt(login.substring(1 + "User".length()));
+////
+////                    return new Point(type, number);\
+//                    return logi
+//                }).sorted((a, b) -> {
+//                    if (a.x != b.x) return a.x - b.x;
+//                    return a.y - b.y;
+//                }).map(p -> "" + (char)p.x + "User" + p.y)
                 .collect(Collectors.toList());
 
         try {

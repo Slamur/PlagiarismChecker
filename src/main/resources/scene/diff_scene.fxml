@@ -42,7 +42,10 @@
             <Button fx:id="filterComparisonsButton" text="Применить фильтры"/>
         </HBox>
 
-        <ListView fx:id="clusterFiltersListView"/>
+        <HBox>
+            <ListView fx:id="clusterFiltersListView"/>
+            <ListView fx:id="ipFiltersListView"/>
+        </HBox>
     </VBox>
 
     <TextArea fx:id="leftParticipantInfoTextArea" prefHeight="100.0" GridPane.columnIndex="1" GridPane.rowIndex="0" />

@@ -12,6 +12,7 @@ public enum Verdict {
     CE(List.of("CE", "Compilation error")),
     PE(List.of("PE", "Presentation error")),
     DQ(List.of("DQ", "Disqualified")),
+    WT(List.of("WT", "Wall TLE")),
     VIRTUAL_START(List.of("VS", "Virtual start")),
     VIRTUAL_FINISH(List.of("VT", "Virtual stop")),
     DISQUALIFIED(Collections.emptyList()),

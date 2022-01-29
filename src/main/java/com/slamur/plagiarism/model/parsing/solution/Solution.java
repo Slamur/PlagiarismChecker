@@ -16,6 +16,7 @@ public class Solution implements Comparable<Solution> {
     public final Verdict verdict;
     public final int score;
     public final LocalDateTime dateTime;
+    public final String ip;
 
     public Solution(String id,
                     Participant participant,
@@ -23,7 +24,8 @@ public class Solution implements Comparable<Solution> {
                     SolutionProgram program,
                     Verdict verdict,
                     int score,
-                    LocalDateTime dateTime) {
+                    LocalDateTime dateTime,
+                    String ip) {
         this.id = id;
         this.participant = participant;
         this.problemName = problemName;
@@ -31,6 +33,7 @@ public class Solution implements Comparable<Solution> {
         this.verdict = verdict;
         this.score = score;
         this.dateTime = dateTime;
+        this.ip = ip;
     }
 
     public String getId() {
@@ -70,6 +73,7 @@ public class Solution implements Comparable<Solution> {
                 verdict + "\n" +
                 score + "\n" +
                 getDateTimeString() + "\n" +
+                ip + "\n" +
                 program;
     }
 

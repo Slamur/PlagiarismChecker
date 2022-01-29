@@ -80,6 +80,8 @@ public class ParticipantRepository {
                         in.readLine(), DATE_TIME_FORMATTER
                 );
 
+                String ip = in.readLine();
+
                 // TODO separate SolutionProgram reading
                 Language language = Language.fromExtension(in.readLine());
 
@@ -101,7 +103,8 @@ public class ParticipantRepository {
                                 program,
                                 verdict,
                                 score,
-                                dateTime
+                                dateTime,
+                                ip
                         )
                 );
             }

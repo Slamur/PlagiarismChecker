@@ -67,19 +67,22 @@ public class EjudgeLocalContestLoader implements ContestLoader {
         public final int score;
         public final LocalDateTime dateTime;
         public final Language language;
+        public final String ip;
 
         public EjudgeSolutionInfo(String login,
                                   String problemName,
                                   Verdict verdict,
                                   int score,
                                   LocalDateTime dateTime,
-                                  Language language) {
+                                  Language language,
+                                  String ip) {
             this.login = login;
             this.problemName = problemName;
             this.verdict = verdict;
             this.score = score;
             this.dateTime = dateTime;
             this.language = language;
+            this.ip = ip;
         }
     }
 
@@ -118,6 +121,8 @@ public class EjudgeLocalContestLoader implements ContestLoader {
                 int minutesColumn = nameToColumn.get("Min");
                 int secondsColumn = nameToColumn.get("Sec");
 
+                int ipColumn = nameToColumn.get("IP");
+
                 in.lines().forEach(line -> {
                     try {
                         var row = line.split(separator);
@@ -135,6 +140,8 @@ public class EjudgeLocalContestLoader implements ContestLoader {
                                 Integer.parseInt(row[secondsColumn])
                         );
 
+                        String ip = row[ipColumn];
+
                         String login = row[participantsLoginColumn];
 
                         int id = Integer.parseInt(row[idColumn]);
@@ -149,7 +156,8 @@ public class EjudgeLocalContestLoader implements ContestLoader {
                                 verdict,
                                 score,
                                 dateTime,
-                                language
+                                language,
+                                ip
                         ));
 
                         if (!participantsInfo.containsKey(login)) {
@@ -305,7 +313,8 @@ public class EjudgeLocalContestLoader implements ContestLoader {
                                     Verdict.DISQUALIFIED,
                                     0,
                                     dateTime,
-                                    language
+                                    language,
+                                    ""
                             )
                     );
                 }
@@ -317,7 +326,8 @@ public class EjudgeLocalContestLoader implements ContestLoader {
                         program,
                         solutionInfo.verdict,
                         solutionInfo.score,
-                        dateTime
+                        dateTime,
+                        solutionInfo.ip
                 );
 
                 solutionsWithCode.put(Integer.parseInt(solutionId), solution);
@@ -349,7 +359,8 @@ public class EjudgeLocalContestLoader implements ContestLoader {
                         new SolutionProgram(solutionInfo.language, ""),
                         solutionInfo.verdict,
                         solutionInfo.score,
-                        solutionInfo.dateTime
+                        solutionInfo.dateTime,
+                        solutionInfo.ip
                 );
             }
 

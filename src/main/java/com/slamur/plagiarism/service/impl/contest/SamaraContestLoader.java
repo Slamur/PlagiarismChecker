@@ -309,7 +309,8 @@ public class SamaraContestLoader implements ContestLoader {
                 program,
                 verdict,
                 score,
-                dateTime
+                dateTime,
+                    ""
             )
         );
     }

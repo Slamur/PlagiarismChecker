@@ -31,18 +31,17 @@ public class EjudgeContest extends Contest {
             KOTECH,
             242,
             LocalDate.of(2022, 1, 23),
-            LocalTime.of(10, 0, 0),
+            LocalTime.of(10, 40, 0),
             LocalDate.of(2022, 1, 23),
-            LocalTime.of(15, 0, 0),
+            LocalTime.of(14, 40, 0),
             problemsRange('A', 'I'),
-            // TODO fix later
-            "/home/slamur/Documents/Cognitive Technologies/2021-2022/Qual/Solutions/contest_220_20211223215014",
-            "/home/slamur/Documents/Cognitive Technologies/2021-2022/Qual/Solutions/solutions.csv",
+            "/home/slamur/Documents/Cognitive Technologies/2021-2022/Finals/contest_242_20220123145921",
+            "/home/slamur/Documents/Cognitive Technologies/2021-2022/Finals/solutions.csv",
             1
     ) {
         @Override
         public List<String> getInterestingProblems() {
-            return EjudgeContest.problemsRange('C', 'H');
+            return EjudgeContest.problemsRange('A', 'I');
         }
     };
 

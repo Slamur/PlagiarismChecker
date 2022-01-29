@@ -58,7 +58,7 @@ public class Services {
         this.propertiesService = new PropertiesService();
         this.credentialsService = new CredentialsService();
         this.contestService = new ContestServiceImpl(
-                EjudgeLocalContestLoader.forLocal(EjudgeContest.KOTECH_2021_QUAL)
+                EjudgeLocalContestLoader.forLocal(EjudgeContest.KOTECH_2021_FINALS)
         );
         this.comparisonService = new ComparisonService();
         this.verificationService = new VerificationService();
