@@ -32,9 +32,8 @@ public class ComparisonService extends ServiceBase {
     private static final boolean onlyEqualScoreScan = true;
 
     // TODO make it comparison parameter
-    private static final double solutionSimilarityFilter = 0.9;
-
-    private static final double minimalSimilarityLimit = 0.7;
+    private static final double solutionSimilarityFilter = 0.7;
+    private static final double minimalSimilarityLimit = 0.5;
 
     private final ObservableList<Comparison> comparisons;
 

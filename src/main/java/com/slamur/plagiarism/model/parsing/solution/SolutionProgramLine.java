@@ -17,7 +17,7 @@ public class SolutionProgramLine {
             "for", "while", "do",
             "repeat", "until",
 
-            "if", "then", "else",
+            "if", "then", "else", "elif",
             "not", "and", "or",
 
             "div", "mod",
@@ -40,16 +40,28 @@ public class SolutionProgramLine {
             "cin", "cout", "scanf", "printf",
             "scanner", "system", "in", "out",
             "input", "print", "println",
+            "split", "strip",
             "read", "readln", "write", "writeln",
 
-            "map", "hashmap", "treemap",
+            "map", "hashmap", "treemap", "unordered_map", "unordered",
             "list", "arraylist", "vector",
-            "set", "hashset", "treeset",
+            "set", "hashset", "treeset", "unordered_set", "unordered",
             "queue", "deque", "stack",
-            "pair",
+            "pair", "tuple",
+
+            "include", "import",
+            "cstdio", "iostream",
+            "algorithm",
+            "math", "cmath",
+            "bits", "stdc++", "bits/stdc++",
+            "using", "namespace", "std",
+            "utils", "io",
+
+            "ifdef", "endif",
 
             "abs", "min", "max",
-            "sin", "cos",
+            "sin", "cos", "asin", "acos",
+            "tan", "atan", "atan2",
 
             "public", "private", "static",
             "final", "const",
@@ -72,6 +84,7 @@ public class SolutionProgramLine {
     }
 
     static boolean isSpecial(char ch) {
+        if ('_' == ch) return false; // id separator
         return !Character.isLetterOrDigit(ch);
     }
 
