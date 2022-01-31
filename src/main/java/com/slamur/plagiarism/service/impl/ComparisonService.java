@@ -208,8 +208,7 @@ public class ComparisonService extends ServiceBase {
 
     public Predicate<Comparison> withAuthorsOf(Comparison source) {
         return (comparison) ->
-                source.left.getParticipant().equals(comparison.left.getParticipant())
-                && source.right.getParticipant().equals(comparison.right.getParticipant());
+                source.toParticipantIds().equals(comparison.toParticipantIds());
     }
 
     public Predicate<Comparison> withParticipant(String participantId) {

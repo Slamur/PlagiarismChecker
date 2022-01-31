@@ -175,7 +175,7 @@ public class CodeforcesLocalContestLoader implements ContestLoader {
                     solutionInfo.verdict,
                     solutionInfo.score,
                     solutionInfo.dateTime,
-                    ""
+                    "1.2.3.4"
             );
 
             participantSolutions.addSolution(solution);
