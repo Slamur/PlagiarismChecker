@@ -42,6 +42,7 @@ public class SolutionProgramLine {
             "input", "print", "println",
             "split", "strip",
             "read", "readln", "write", "writeln",
+            "console", "writeline", "readline",
 
             "map", "hashmap", "treemap", "unordered_map", "unordered",
             "list", "arraylist", "vector",
@@ -65,6 +66,9 @@ public class SolutionProgramLine {
 
             "public", "private", "static",
             "final", "const",
+
+            "main", "program",
+            "class",
     };
 
     final static String BRACKETS = "[]{}()<>";

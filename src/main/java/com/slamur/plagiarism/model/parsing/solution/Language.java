@@ -12,6 +12,7 @@ public enum Language {
     PASCAL("pas", List.of("fpc"), Map.of("\\{", "\\}"), "//"),
     CPP("cpp", List.of("g++", "gpp17"), Map.of("/\\*", "\\*/"), "//"),
     JAVA("java", List.of("javac", "javaw17"), Map.of("/\\*", "\\*/"), "//"),
+    CSHARP("cs", List.of("charp"), Map.of("/\\*", "\\*/"), "//"),
     PYTHON("py", List.of("python3", "py39"), Map.of("'''", "'''"), "#"),
     TEXT("txt", emptyList(), emptyMap(), "");
 
