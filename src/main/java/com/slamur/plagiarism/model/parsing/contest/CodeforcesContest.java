@@ -17,7 +17,7 @@ public class CodeforcesContest extends Contest {
             LocalDate.of(2022, 1, 30),
             LocalTime.of(16, 0, 0),
             problemsRange('A', 'G'),
-            "/home/slamur/Documents/MIREA/Qual 30.01.2022/Solutions"
+            "/home/slamur/Documents/MIREA/School/Qual 30.01.2022/Solutions"
     );
 
     private final String localDirectoryPath;
