@@ -86,12 +86,12 @@ public class CodeforcesLocalContestLoader implements ContestLoader {
 
             Language language = Language.fromExtension(extension);
 
-            String fileNameWithoutExtension = fileName.substring(lastDotIndex);
+            String fileNameWithoutExtension = fileName.substring(0, lastDotIndex);
 
             int lastSpaceIndex = fileNameWithoutExtension.lastIndexOf("_");
             String problemName = fileNameWithoutExtension.substring(lastSpaceIndex + 1);
 
-            String login = fileNameWithoutExtension.substring(lastSpaceIndex);
+            String login = fileNameWithoutExtension.substring(0, lastSpaceIndex);
 
             try {
                 String code = readCode(solutionFile);
