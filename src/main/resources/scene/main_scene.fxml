@@ -10,6 +10,7 @@
             <MenuItem fx:id="saveRawDataMenuItem" text="Сохранить данные"/>
             <MenuItem fx:id="loadRawDataMenuItem" text="Загрузить данные и слить с текущими"/>
             <MenuItem fx:id="saveReportMenuItem" text="Выгрузить полный протокол"/>
+            <MenuItem fx:id="saveStandingsMenuItem" text="Выгрузить положение участников"/>
         </Menu>
     </MenuBar>
 
