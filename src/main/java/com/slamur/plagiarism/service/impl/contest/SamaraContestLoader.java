@@ -36,7 +36,7 @@ public class SamaraContestLoader implements ContestLoader {
 
     private static final String HREF_TAG_NAME = "href";
 
-    public static final String DOMAIN = "http://contest.samsu.ru";//"http://contest.samsu.ru/ru/";
+    public static final String DOMAIN = "http://contest.samsu.ru";
     private static final String USER_AGENT = "Mozilla/5.0";
 
     public static final String PROFILE_PREFIX = "/ru/viewprofile";
