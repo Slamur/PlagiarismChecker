@@ -159,16 +159,6 @@ public class ContestServiceImpl extends ServiceBase implements ContestService {
                 .map(Participant::getLogin)
                 .filter(login -> List.of("ejudge", "INVALID").stream().noneMatch(login::contains))
                 .sorted()
-//                .map(login -> {
-////                    var type = login.charAt(0);
-////                    var number = Integer.parseInt(login.substring(1 + "User".length()));
-////
-////                    return new Point(type, number);\
-//                    return logi
-//                }).sorted((a, b) -> {
-//                    if (a.x != b.x) return a.x - b.x;
-//                    return a.y - b.y;
-//                }).map(p -> "" + (char)p.x + "User" + p.y)
                 .collect(Collectors.toList());
 
         try {
