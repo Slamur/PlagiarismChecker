@@ -93,8 +93,6 @@ public class ParticipantRepository {
 
                 var program = new SolutionProgram(language, codeBuilder.toString());
 
-                in.readLine();
-
                 participantSolutions.addSolution(
                         new Solution(
                                 id,

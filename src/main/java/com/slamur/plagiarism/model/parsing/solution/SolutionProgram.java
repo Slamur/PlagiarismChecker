@@ -76,22 +76,6 @@ public class SolutionProgram {
             parsedCodeBuilder.append(ch);
         }
 
-//        while (true) {
-//            int multiStartIndex = parsedCode.indexOf(multiStart);
-//            if (multiStartIndex < 0) break;
-//
-//            int multiEndIndex = parsedCode.indexOf(multiEnd, multiStartIndex);
-//            parsedCode = parsedCode.substring(0, multiStartIndex) + parsedCode.substring(multiEndIndex + 1);
-//        }
-//
-//        while (true) {
-//            int singleIndex = parsedCode.indexOf(single);
-//            if (singleIndex < 0) break;
-//
-//            int newLineIndex = parsedCode.indexOf(newLine, singleIndex);
-//            parsedCode = parsedCode.substring(0, singleIndex) + parsedCode.substring(newLineIndex);
-//        }
-
         String[] codeLines = parsedCodeBuilder.toString().split("" + newLine);
         for (var line : codeLines) {
             if (!line.trim().isEmpty()) {
