@@ -293,7 +293,7 @@ public class SamaraContestLoader implements ContestLoader {
 
         String code = Parser.unescapeEntities(codeElement.text(), true);
 
-        var program = new SolutionProgram(language, code);
+        var program = SolutionProgram.create(language, code, verdict);
 
         String solutionId = submitLink.substring(
                 submitLink.indexOf(SOLUTION_PREFIX + "/") + (SOLUTION_PREFIX + "/").length()

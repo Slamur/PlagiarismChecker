@@ -22,16 +22,24 @@ public class SolutionProgram {
         return MatchingSimilarityCalculator.calculate(leftRows, rightRows, filter, minimalSimilarityLimit);
     }
 
+    public static SolutionProgram create(
+            Language language,
+            String code,
+            Verdict verdict
+    ) {
+        var program = new SolutionProgram(language, code);
+        if (verdict != Verdict.CE) program.parseCode();
+        return program;
+    }
+
     public final Language language;
     public final String code;
     private final List<SolutionProgramLine> parsedLines;
 
-    public SolutionProgram(Language language, String code) {
+    private SolutionProgram(Language language, String code) {
         this.language = language;
         this.code = code;
-
         this.parsedLines = new ArrayList<>();
-        parseCode();
     }
 
     private void parseCode() {

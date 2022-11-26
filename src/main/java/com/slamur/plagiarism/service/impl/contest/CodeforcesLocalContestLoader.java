@@ -171,7 +171,7 @@ public class CodeforcesLocalContestLoader implements ContestLoader {
                     Integer.toString(solutionId),
                     participant,
                     solutionInfo.problemName,
-                    new SolutionProgram(solutionInfo.language, solutionInfo.code),
+                    SolutionProgram.create(solutionInfo.language, solutionInfo.code, solutionInfo.verdict),
                     solutionInfo.verdict,
                     solutionInfo.score,
                     solutionInfo.dateTime,
