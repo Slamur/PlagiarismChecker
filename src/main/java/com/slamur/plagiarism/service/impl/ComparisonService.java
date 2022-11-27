@@ -112,7 +112,7 @@ public class ComparisonService extends ServiceBase {
 
             if (leftIndex % blockSize == blockSize - 1) {
                 System.out.printf("Закончены сравнения с %d-м решением %s (%s) %n",
-                        leftIndex, leftSolution.id, leftSolution.getParticipant().id
+                        leftIndex, leftSolution.id, leftSolution.getParticipant().login
                 );
             }
 

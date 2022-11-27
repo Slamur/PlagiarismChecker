@@ -127,7 +127,7 @@ public class SamaraContestLoader implements ContestLoader {
         String login = linkWithoutAll.substring(linkWithoutAll.lastIndexOf("/") + 1);
         String id = login.substring(login.indexOf("_") + 1);
 
-        return new Participant(login, id, contest);
+        return new Participant(login, contest);
     }
 
     @Override
