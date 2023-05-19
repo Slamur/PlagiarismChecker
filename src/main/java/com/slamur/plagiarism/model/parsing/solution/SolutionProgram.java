@@ -22,16 +22,24 @@ public class SolutionProgram {
         return MatchingSimilarityCalculator.calculate(leftRows, rightRows, filter, minimalSimilarityLimit);
     }
 
+    public static SolutionProgram create(
+            Language language,
+            String code,
+            Verdict verdict
+    ) {
+        var program = new SolutionProgram(language, code);
+        if (verdict != Verdict.CE) program.parseCode();
+        return program;
+    }
+
     public final Language language;
     public final String code;
     private final List<SolutionProgramLine> parsedLines;
 
-    public SolutionProgram(Language language, String code) {
+    private SolutionProgram(Language language, String code) {
         this.language = language;
         this.code = code;
-
         this.parsedLines = new ArrayList<>();
-        parseCode();
     }
 
     private void parseCode() {
@@ -75,22 +83,6 @@ public class SolutionProgram {
 
             parsedCodeBuilder.append(ch);
         }
-
-//        while (true) {
-//            int multiStartIndex = parsedCode.indexOf(multiStart);
-//            if (multiStartIndex < 0) break;
-//
-//            int multiEndIndex = parsedCode.indexOf(multiEnd, multiStartIndex);
-//            parsedCode = parsedCode.substring(0, multiStartIndex) + parsedCode.substring(multiEndIndex + 1);
-//        }
-//
-//        while (true) {
-//            int singleIndex = parsedCode.indexOf(single);
-//            if (singleIndex < 0) break;
-//
-//            int newLineIndex = parsedCode.indexOf(newLine, singleIndex);
-//            parsedCode = parsedCode.substring(0, singleIndex) + parsedCode.substring(newLineIndex);
-//        }
 
         String[] codeLines = parsedCodeBuilder.toString().split("" + newLine);
         for (var line : codeLines) {

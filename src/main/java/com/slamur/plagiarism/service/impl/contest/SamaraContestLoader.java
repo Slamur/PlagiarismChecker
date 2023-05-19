@@ -36,7 +36,7 @@ public class SamaraContestLoader implements ContestLoader {
 
     private static final String HREF_TAG_NAME = "href";
 
-    public static final String DOMAIN = "http://contest.samsu.ru";//"http://contest.samsu.ru/ru/";
+    public static final String DOMAIN = "http://contest.samsu.ru";
     private static final String USER_AGENT = "Mozilla/5.0";
 
     public static final String PROFILE_PREFIX = "/ru/viewprofile";
@@ -127,7 +127,7 @@ public class SamaraContestLoader implements ContestLoader {
         String login = linkWithoutAll.substring(linkWithoutAll.lastIndexOf("/") + 1);
         String id = login.substring(login.indexOf("_") + 1);
 
-        return new Participant(login, id, contest);
+        return new Participant(login, contest);
     }
 
     @Override
@@ -293,7 +293,7 @@ public class SamaraContestLoader implements ContestLoader {
 
         String code = Parser.unescapeEntities(codeElement.text(), true);
 
-        var program = new SolutionProgram(language, code);
+        var program = SolutionProgram.create(language, code, verdict);
 
         String solutionId = submitLink.substring(
                 submitLink.indexOf(SOLUTION_PREFIX + "/") + (SOLUTION_PREFIX + "/").length()

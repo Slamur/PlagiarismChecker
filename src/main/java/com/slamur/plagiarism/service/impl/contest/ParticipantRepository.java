@@ -91,9 +91,13 @@ public class ParticipantRepository {
                     codeBuilder.append(in.readLine()).append("\n");
                 }
 
-                var program = new SolutionProgram(language, codeBuilder.toString());
+                var program = SolutionProgram.create(
+                        language,
+                        codeBuilder.toString(),
+                        verdict
+                );
 
-                in.readLine();
+//                in.readLine();
 
                 participantSolutions.addSolution(
                         new Solution(

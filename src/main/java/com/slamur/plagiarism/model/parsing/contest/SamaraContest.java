@@ -61,6 +61,30 @@ public class SamaraContest extends Contest {
             problemsRange('A', 'E')
     );
 
+    public static final SamaraContest OKRUG_2022 = new SamaraContest(
+            CITY, 596,
+            LocalDate.of(2022, 11, 26),
+            LocalTime.of(10, 0),
+            LocalTime.of(14, 0),
+            problemsRange('A', 'E')
+    );
+
+    public static final SamaraContest REGION_2023_1 = new SamaraContest(
+            REGION, 599,
+            LocalDate.of(2023, 1, 21),
+            LocalTime.of(9, 57),
+            LocalTime.of(14, 57),
+            problemsRange('A', 'D')
+    );
+
+    public static final SamaraContest REGION_2023_2 = new SamaraContest(
+            REGION, 600,
+            LocalDate.of(2023, 1, 23),
+            LocalTime.of(9, 17),
+            LocalTime.of(14, 17),
+            problemsRange('E', 'H')
+    );
+
     public SamaraContest(String type,
                          int id,
                          LocalDate date,

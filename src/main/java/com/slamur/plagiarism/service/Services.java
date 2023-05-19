@@ -1,13 +1,13 @@
 package com.slamur.plagiarism.service;
 
-import com.slamur.plagiarism.model.parsing.contest.CodeforcesContest;
+import com.slamur.plagiarism.model.parsing.contest.SamaraContest;
 import com.slamur.plagiarism.service.impl.ComparisonService;
 import com.slamur.plagiarism.service.impl.ContestServiceImpl;
 import com.slamur.plagiarism.service.impl.CredentialsService;
 import com.slamur.plagiarism.service.impl.FxmlStageService;
 import com.slamur.plagiarism.service.impl.PropertiesService;
 import com.slamur.plagiarism.service.impl.VerificationService;
-import com.slamur.plagiarism.service.impl.contest.CodeforcesLocalContestLoader;
+import com.slamur.plagiarism.service.impl.contest.SamaraContestLoader;
 
 public class Services {
 
@@ -56,7 +56,7 @@ public class Services {
         this.propertiesService = new PropertiesService();
         this.credentialsService = new CredentialsService();
         this.contestService = new ContestServiceImpl(
-                CodeforcesLocalContestLoader.forLocal(CodeforcesContest.MIREA_SCHOOL_QUAL_2022_JAN_30)
+                new SamaraContestLoader(SamaraContest.REGION_2023_2)
         );
         this.comparisonService = new ComparisonService();
         this.verificationService = new VerificationService();

@@ -301,10 +301,10 @@ public class EjudgeLocalContestLoader implements ContestLoader {
 
                 Language language = Language.fromExtension(solutionFileName.substring(dot + 1));
                 String code = readCode(solutionFile);
-                var program = new SolutionProgram(language, code);
 
                 int solutionIdInt = Integer.parseInt(solutionId);
                 EjudgeSolutionInfo solutionInfo = solutionsInfo.get(solutionIdInt);
+
                 if (null == solutionInfo) {
                     solutionsInfo.put(solutionIdInt,
                             solutionInfo = new EjudgeSolutionInfo(
@@ -318,6 +318,8 @@ public class EjudgeLocalContestLoader implements ContestLoader {
                             )
                     );
                 }
+
+                var program = SolutionProgram.create(language, code, solutionInfo.verdict);
 
                 var solution = new Solution(
                         solutionId,
@@ -356,7 +358,7 @@ public class EjudgeLocalContestLoader implements ContestLoader {
                         Integer.toString(1000 * 1000 + solutionId).substring(1),
                         participant,
                         solutionInfo.problemName,
-                        new SolutionProgram(solutionInfo.language, ""),
+                        SolutionProgram.create(solutionInfo.language, "", solutionInfo.verdict),
                         solutionInfo.verdict,
                         solutionInfo.score,
                         solutionInfo.dateTime,
