@@ -120,6 +120,8 @@ public class DiffController extends TabController {
 
     @FXML public Button runAutoPlagiatButton;
 
+    private int participantsPairIndex;
+
     private int comparisonIndex;
     private Comparison comparison;
 
@@ -148,6 +150,7 @@ public class DiffController extends TabController {
 
         this.comparison = null;
         this.comparisonIndex = -1;
+        this.participantsPairIndex = -1;
     }
 
     private void initializeAutoPlagiatPart() {
@@ -197,8 +200,25 @@ public class DiffController extends TabController {
             comparisonIndex = 0;
         }
 
-        comparisonIndex = (comparisonIndex + comparisons.size() + shift) % comparisons.size();
-        selectComparison(comparisonIndex);
+        int nextComparisonIndex = comparisonIndex + shift;
+        if (nextComparisonIndex < 0) {
+            moveParticipantsPair(-1);
+        } else if (comparisons.size() <= nextComparisonIndex) {
+            moveParticipantsPair(1);
+        } else {
+            selectComparison(nextComparisonIndex);
+        }
+    }
+
+    private void moveParticipantsPair(int shift) {
+        int pairsCount = participantPairsListView.getItems().size();
+        int nextPairIndex = (participantsPairIndex + pairsCount + shift) % pairsCount;
+
+        selectParticipantPairs(nextPairIndex);
+        if (shift < 0) {
+            List<Comparison> comparisons = comparisonsListView.getItems();
+            selectComparison(comparisons.size() - 1);
+        }
     }
 
     private void initializeBlindMode() {
@@ -511,6 +531,7 @@ public class DiffController extends TabController {
 
         var participantsPair = participantPairsListView.getItems().get(participantPairsIndex);
 
+        this.participantsPairIndex = participantPairsIndex;
         comparisonsListView.setItems(
                 participantsToComparisons.get(participantsPair)
         );
