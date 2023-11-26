@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import com.slamur.plagiarism.model.parsing.solution.Solution;
 
@@ -136,17 +137,6 @@ public class Cluster {
         return builder.toString();
     }
 
-    @Override
-    public String toString() {
-        String minParticipantId = getSolutions().stream()
-                .map(Solution::getParticipant)
-                .map(participant -> participant.id)
-                .min(String::compareTo)
-                .orElse("-1");
-
-        return minParticipantId + " " + problemName;
-    }
-
     public void mergeCliques(Solution left, Solution right) {
         var leftClique = solutionToClique.get(left);
         var rightClique = solutionToClique.get(right);
@@ -263,17 +253,39 @@ public class Cluster {
         return solutionToClique.get(solution);
     }
 
+    private Stream<String> toParticipantIds() {
+        return getSolutions().stream()
+                .map(Solution::getParticipant)
+                .map(participant -> participant.id);
+    }
+
+    @Override
+    public String toString() {
+        String minParticipantId = toParticipantIds()
+                .min(String::compareTo)
+                .orElse("-1");
+
+        return minParticipantId + " " + problemName;
+    }
+
+    private String toIdString() {
+        String allParticipantIds = toParticipantIds()
+                .sorted()
+                .collect(Collectors.joining("|"));
+
+        return allParticipantIds + " " + problemName;
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
-        if (!(obj instanceof Cluster)) return false;
+        if (!(obj instanceof Cluster other)) return false;
 
-        Cluster other = (Cluster) obj;
-        return this.toString().equals(other.toString());
+        return this.toIdString().equals(other.toIdString());
     }
 
     @Override
     public int hashCode() {
-        return toString().hashCode();
+        return toIdString().hashCode();
     }
 }
