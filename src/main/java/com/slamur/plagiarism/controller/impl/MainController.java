@@ -1,12 +1,14 @@
 package com.slamur.plagiarism.controller.impl;
 
 import java.net.URL;
+import java.util.List;
 import java.util.Optional;
 import java.util.ResourceBundle;
 
 import com.slamur.plagiarism.controller.Controller;
 import com.slamur.plagiarism.model.verification.Cluster;
 import com.slamur.plagiarism.model.verification.Comparison;
+import com.slamur.plagiarism.model.verification.Status;
 import com.slamur.plagiarism.service.Services;
 import com.slamur.plagiarism.utils.AlertUtils;
 import javafx.event.ActionEvent;
@@ -43,6 +45,8 @@ public class MainController implements Controller {
     @FXML public MenuItem saveReportMenuItem;
 
     @FXML public MenuItem saveStandingsMenuItem;
+
+    @FXML public MenuItem notSeenToIgnoredMenuItem;
 
     @Override
     public void initialize(URL url, ResourceBundle resourceBundle) {
@@ -91,6 +95,8 @@ public class MainController implements Controller {
         loadRawDataMenuItem.setOnAction(this::loadRawDataAction);
         saveReportMenuItem.setOnAction(this::saveReportAction);
         saveStandingsMenuItem.setOnAction(this::saveStandingsAction);
+
+        notSeenToIgnoredMenuItem.setOnAction(this::notSeenToIgnoredAction);
     }
 
     private void saveRawDataAction(ActionEvent event) {
@@ -159,5 +165,16 @@ public class MainController implements Controller {
                     "Ошибка при сохранении положения участников", e
             );
         }
+    }
+
+    private void notSeenToIgnoredAction(ActionEvent event) {
+        var verification = Services.verification();
+
+        Services.comparisons()
+                .filtered(
+                        verification.withStatus(List.of(Status.NOT_SEEN))
+                ).forEach(
+                        comparison -> verification.setStatus(comparison, Status.IGNORED)
+                );
     }
 }

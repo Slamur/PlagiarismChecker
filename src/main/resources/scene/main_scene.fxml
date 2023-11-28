@@ -12,6 +12,9 @@
             <MenuItem fx:id="saveReportMenuItem" text="Выгрузить полный протокол"/>
             <MenuItem fx:id="saveStandingsMenuItem" text="Выгрузить положение участников"/>
         </Menu>
+        <Menu text="Diff">
+            <MenuItem fx:id="notSeenToIgnoredMenuItem" text="Непросмотренные - не списано"/>
+        </Menu>
     </MenuBar>
 
     <TabPane fx:id="tabPane" GridPane.columnIndex="0" GridPane.rowIndex="1">
