@@ -251,6 +251,8 @@ public class SamaraContestLoader implements ContestLoader {
             }
         }
 
+        if (score == 0) return Optional.empty();
+
         // parsing time
         Element timeElement = submitPage.getElementsContainingOwnText("Отправлено").first();
         if (timeElement == null) return Optional.empty();

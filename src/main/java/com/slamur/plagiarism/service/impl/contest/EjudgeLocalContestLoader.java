@@ -319,6 +319,8 @@ public class EjudgeLocalContestLoader implements ContestLoader {
                     );
                 }
 
+                if (solutionInfo.score == 0) return;
+
                 var program = SolutionProgram.create(language, code, solutionInfo.verdict);
 
                 var solution = new Solution(

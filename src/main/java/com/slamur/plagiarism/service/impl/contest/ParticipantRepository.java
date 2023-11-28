@@ -52,7 +52,10 @@ public class ParticipantRepository {
     private static void saveSolutionsToFile(File file, ParticipantSolutions participantSolutions)
             throws FileNotFoundException, UnsupportedEncodingException {
         IOUtils.saveToFile(file, (out) -> {
-            var solutions = participantSolutions.getAllSolutions();
+            var solutions = participantSolutions.getAllSolutions().stream()
+                    .filter(solution -> solution.getScore() > 0)
+                    .toList();
+
             out.println(solutions.size());
             for (Solution solution : solutions) {
                 out.println(solution.toText());

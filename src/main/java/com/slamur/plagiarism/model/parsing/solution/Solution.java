@@ -40,6 +40,8 @@ public class Solution implements Comparable<Solution> {
         return id;
     }
 
+    public int getScore() { return score; }
+
     public Participant getParticipant() {
         return participant;
     }

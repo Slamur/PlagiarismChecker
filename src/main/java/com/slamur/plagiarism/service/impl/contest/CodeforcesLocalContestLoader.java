@@ -167,6 +167,8 @@ public class CodeforcesLocalContestLoader implements ContestLoader {
         for (var solutionId : participantToSolutions.get(participant.login)) {
             var solutionInfo = solutionInfos.get(solutionId);
 
+            if (solutionInfo.score == 0) continue;
+
             var solution = new Solution(
                     Integer.toString(solutionId),
                     participant,
