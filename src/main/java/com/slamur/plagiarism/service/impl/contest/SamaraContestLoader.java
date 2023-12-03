@@ -289,13 +289,11 @@ public class SamaraContestLoader implements ContestLoader {
                     return fullLanguageLine.substring(space + 1);
                 }).orElse("UNKNOWN");
 
-        Language language = Language.fromAlias(languageString);
-
         Element codeElement = submitPage.getElementsByTag("code").first();
 
         String code = Parser.unescapeEntities(codeElement.text(), true);
 
-        var program = SolutionProgram.create(language, code, verdict);
+        var program = SolutionProgram.create(languageString, code, verdict);
 
         String solutionId = submitLink.substring(
                 submitLink.indexOf(SOLUTION_PREFIX + "/") + (SOLUTION_PREFIX + "/").length()

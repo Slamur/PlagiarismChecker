@@ -43,10 +43,10 @@ public enum Language {
                 .orElse(Language.TEXT);
     }
 
-    public static Language fromAlias(String alias) {
+    public static Language fromAliasOrExtension(String alias) {
         return Arrays.stream(Language.values())
                 .filter(language -> language.aliases.contains(alias))
                 .findAny()
-                .orElse(Language.TEXT);
+                .orElseGet(() -> fromExtension(alias));
     }
 }

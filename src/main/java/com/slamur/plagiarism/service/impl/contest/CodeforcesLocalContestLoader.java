@@ -55,7 +55,7 @@ public class CodeforcesLocalContestLoader implements ContestLoader {
         public final Verdict verdict;
         public final int score;
         public final LocalDateTime dateTime;
-        public final Language language;
+        public final String languageAlias;
         public final String code;
 
         public CodeforcesSolutionInfo(String login,
@@ -63,14 +63,14 @@ public class CodeforcesLocalContestLoader implements ContestLoader {
                                       Verdict verdict,
                                       int score,
                                       LocalDateTime dateTime,
-                                      Language language,
+                                      String languageAlias,
                                       String code) {
             this.login = login;
             this.problemName = problemName;
             this.verdict = verdict;
             this.score = score;
             this.dateTime = dateTime;
-            this.language = language;
+            this.languageAlias = languageAlias;
             this.code = code;
         }
     }
@@ -83,8 +83,6 @@ public class CodeforcesLocalContestLoader implements ContestLoader {
 
             int lastDotIndex = fileName.lastIndexOf(".");
             String extension = fileName.substring(lastDotIndex + 1);
-
-            Language language = Language.fromExtension(extension);
 
             String fileNameWithoutExtension = fileName.substring(0, lastDotIndex);
 
@@ -102,7 +100,7 @@ public class CodeforcesLocalContestLoader implements ContestLoader {
                         Verdict.AC,
                         1,
                         codeforcesContest.getStartDateTime(),
-                        language,
+                        extension,
                         code
                 );
             } catch (IOException e) {
@@ -173,7 +171,7 @@ public class CodeforcesLocalContestLoader implements ContestLoader {
                     Integer.toString(solutionId),
                     participant,
                     solutionInfo.problemName,
-                    SolutionProgram.create(solutionInfo.language, solutionInfo.code, solutionInfo.verdict),
+                    SolutionProgram.create(solutionInfo.languageAlias, solutionInfo.code, solutionInfo.verdict),
                     solutionInfo.verdict,
                     solutionInfo.score,
                     solutionInfo.dateTime,

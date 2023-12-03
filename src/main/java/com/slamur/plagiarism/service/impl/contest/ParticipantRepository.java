@@ -86,7 +86,7 @@ public class ParticipantRepository {
                 String ip = in.readLine();
 
                 // TODO separate SolutionProgram reading
-                Language language = Language.fromExtension(in.readLine());
+                String languageAlias = in.readLine();
 
                 int codeSize = Integer.parseInt(in.readLine());
                 StringBuilder codeBuilder = new StringBuilder();
@@ -95,7 +95,7 @@ public class ParticipantRepository {
                 }
 
                 var program = SolutionProgram.create(
-                        language,
+                        languageAlias,
                         codeBuilder.toString(),
                         verdict
                 );

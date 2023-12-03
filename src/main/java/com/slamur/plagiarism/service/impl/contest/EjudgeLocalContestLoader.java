@@ -22,7 +22,6 @@ import com.slamur.plagiarism.model.parsing.contest.EjudgeContest;
 import com.slamur.plagiarism.model.parsing.participant.Participant;
 import com.slamur.plagiarism.model.parsing.participant.ParticipantInfo;
 import com.slamur.plagiarism.model.parsing.participant.ParticipantSolutions;
-import com.slamur.plagiarism.model.parsing.solution.Language;
 import com.slamur.plagiarism.model.parsing.solution.Solution;
 import com.slamur.plagiarism.model.parsing.solution.SolutionProgram;
 import com.slamur.plagiarism.model.parsing.solution.Verdict;
@@ -66,7 +65,7 @@ public class EjudgeLocalContestLoader implements ContestLoader {
         public final Verdict verdict;
         public final int score;
         public final LocalDateTime dateTime;
-        public final Language language;
+        public final String languageAlias;
         public final String ip;
 
         public EjudgeSolutionInfo(String login,
@@ -74,14 +73,14 @@ public class EjudgeLocalContestLoader implements ContestLoader {
                                   Verdict verdict,
                                   int score,
                                   LocalDateTime dateTime,
-                                  Language language,
+                                  String languageAlias,
                                   String ip) {
             this.login = login;
             this.problemName = problemName;
             this.verdict = verdict;
             this.score = score;
             this.dateTime = dateTime;
-            this.language = language;
+            this.languageAlias = languageAlias;
             this.ip = ip;
         }
     }
@@ -148,7 +147,7 @@ public class EjudgeLocalContestLoader implements ContestLoader {
                         int score = (Verdict.AC == verdict) ? 1 : 0; //Integer.parseInt(row[scoreColumn]);
                         String problemName = row[problemColumn];
 
-                        Language language = Language.fromAlias(row[aliasColumn]);
+                        String extension = row[aliasColumn];
 
                         solutionsInfo.put(id, new EjudgeSolutionInfo(
                                 login,
@@ -156,7 +155,7 @@ public class EjudgeLocalContestLoader implements ContestLoader {
                                 verdict,
                                 score,
                                 dateTime,
-                                language,
+                                extension,
                                 ip
                         ));
 
@@ -299,7 +298,7 @@ public class EjudgeLocalContestLoader implements ContestLoader {
                     return;
                 }
 
-                Language language = Language.fromExtension(solutionFileName.substring(dot + 1));
+                var extension = solutionFileName.substring(dot + 1);
                 String code = readCode(solutionFile);
 
                 int solutionIdInt = Integer.parseInt(solutionId);
@@ -313,7 +312,7 @@ public class EjudgeLocalContestLoader implements ContestLoader {
                                     Verdict.DISQUALIFIED,
                                     0,
                                     dateTime,
-                                    language,
+                                    extension,
                                     ""
                             )
                     );
@@ -321,7 +320,7 @@ public class EjudgeLocalContestLoader implements ContestLoader {
 
                 if (solutionInfo.score == 0) return;
 
-                var program = SolutionProgram.create(language, code, solutionInfo.verdict);
+                var program = SolutionProgram.create(extension, code, solutionInfo.verdict);
 
                 var solution = new Solution(
                         solutionId,
@@ -360,7 +359,7 @@ public class EjudgeLocalContestLoader implements ContestLoader {
                         Integer.toString(1000 * 1000 + solutionId).substring(1),
                         participant,
                         solutionInfo.problemName,
-                        SolutionProgram.create(solutionInfo.language, "", solutionInfo.verdict),
+                        SolutionProgram.create(solutionInfo.languageAlias, "", solutionInfo.verdict),
                         solutionInfo.verdict,
                         solutionInfo.score,
                         solutionInfo.dateTime,

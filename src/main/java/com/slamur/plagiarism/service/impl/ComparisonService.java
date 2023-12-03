@@ -155,7 +155,8 @@ public class ComparisonService extends ServiceBase {
         }
 
         // TODO beatify later
-        if (Language.TEXT == leftSolution.getProgram().language || Language.TEXT == rightSolution.getProgram().language) {
+        if (Language.TEXT == leftSolution.getProgram().getLanguage()
+                || Language.TEXT == rightSolution.getProgram().getLanguage()) {
             return false;
         }
 

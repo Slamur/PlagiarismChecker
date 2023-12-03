@@ -23,23 +23,29 @@ public class SolutionProgram {
     }
 
     public static SolutionProgram create(
-            Language language,
+            String languageAlias,
             String code,
             Verdict verdict
     ) {
-        var program = new SolutionProgram(language, code);
+        var program = new SolutionProgram(languageAlias, code);
         if (verdict != Verdict.CE) program.parseCode();
         return program;
     }
 
+    public final String languageAlias;
     public final Language language;
     public final String code;
     private final List<SolutionProgramLine> parsedLines;
 
-    private SolutionProgram(Language language, String code) {
-        this.language = language;
+    private SolutionProgram(String languageAlias, String code) {
+        this.languageAlias = languageAlias;
+        this.language = Language.fromAliasOrExtension(languageAlias);
         this.code = code;
         this.parsedLines = new ArrayList<>();
+    }
+
+    public Language getLanguage() {
+        return language;
     }
 
     private void parseCode() {
@@ -48,6 +54,7 @@ public class SolutionProgram {
         final char single = 1, multiStart = 2, multiEnd = 3, newLine = '\n', multiEqual = 4;
         if (!parsedCode.endsWith("" + newLine)) parsedCode += newLine;
 
+        var language = getLanguage();
         if (!language.singleLineCommentStart.isEmpty()) {
             parsedCode = parsedCode.replaceAll(language.singleLineCommentStart, "" + single);
         }
@@ -97,6 +104,6 @@ public class SolutionProgram {
     @Override
     public String toString() {
         var codeLines = (code.isEmpty() ? 0 : code.split("\n").length);
-        return language + "\n" + codeLines + "\n" + code;
+        return languageAlias + "\n" + codeLines + "\n" + code;
     }
 }
