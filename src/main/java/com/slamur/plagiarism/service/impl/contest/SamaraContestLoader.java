@@ -15,7 +15,6 @@ import com.slamur.plagiarism.model.parsing.contest.SamaraContest;
 import com.slamur.plagiarism.model.parsing.participant.Participant;
 import com.slamur.plagiarism.model.parsing.participant.ParticipantInfo;
 import com.slamur.plagiarism.model.parsing.participant.ParticipantSolutions;
-import com.slamur.plagiarism.model.parsing.solution.Language;
 import com.slamur.plagiarism.model.parsing.solution.Solution;
 import com.slamur.plagiarism.model.parsing.solution.SolutionProgram;
 import com.slamur.plagiarism.model.parsing.solution.Verdict;
