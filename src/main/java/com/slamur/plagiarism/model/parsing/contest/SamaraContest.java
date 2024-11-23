@@ -93,6 +93,14 @@ public class SamaraContest extends Contest {
             problemsRange('A', 'D')
     );
 
+    public static final SamaraContest OKRUG_2024 = new SamaraContest(
+            CITY,  609,
+            LocalDate.of(2024, 11, 23),
+            LocalTime.of(10, 0),
+            LocalTime.of(14, 7),
+            problemsRange('A', 'E')
+    );
+
     public SamaraContest(String type,
                          int id,
                          LocalDate date,
