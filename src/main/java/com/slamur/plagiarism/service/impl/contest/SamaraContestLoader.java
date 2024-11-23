@@ -8,6 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import com.slamur.plagiarism.model.parsing.contest.Contest;
@@ -215,11 +217,15 @@ public class SamaraContestLoader implements ContestLoader {
 
         String problemName = problemNameElement.text();
         // FIXME later
-        if (!problemName.matches("[A-Z].*") && !problemName.matches("[1-9].*")) return Optional.empty();
+//        if (!problemName.matches() && !problemName.matches("^[1-9].*")) return Optional.empty();
+
+        Matcher letterMatcher = Pattern.compile("[A-Z]").matcher(problemName);
+        if (!letterMatcher.find()) return Optional.empty();
+        String problemLetter = letterMatcher.group(0);
 
         var contest = participant.getContest();
 
-        if (!contest.getProblems().contains(problemName)) {
+        if (!contest.getProblems().contains(problemLetter)) {
             return Optional.empty();
         }
 
@@ -304,7 +310,7 @@ public class SamaraContestLoader implements ContestLoader {
             new Solution(
                 solutionId,
                 participant,
-                problemName,
+                problemLetter,
                 program,
                 verdict,
                 score,
