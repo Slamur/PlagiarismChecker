@@ -1,12 +1,7 @@
 package com.slamur.plagiarism.service;
 
 import com.slamur.plagiarism.model.parsing.contest.SamaraContest;
-import com.slamur.plagiarism.service.impl.ComparisonService;
-import com.slamur.plagiarism.service.impl.ContestServiceImpl;
-import com.slamur.plagiarism.service.impl.CredentialsService;
-import com.slamur.plagiarism.service.impl.FxmlStageService;
-import com.slamur.plagiarism.service.impl.PropertiesService;
-import com.slamur.plagiarism.service.impl.VerificationService;
+import com.slamur.plagiarism.service.impl.*;
 import com.slamur.plagiarism.service.impl.contest.SamaraContestLoader;
 
 public class Services {
@@ -22,6 +17,7 @@ public class Services {
         credentials().afterInitialization(contest()::initialize);
         contest().afterInitialization(comparisons()::initialize);
         comparisons().afterInitialization(verification()::initialize);
+        verification().afterInitialization(interesting()::initialize);
 
         properties().initialize();
     }
@@ -44,12 +40,15 @@ public class Services {
         return instance.verificationService;
     }
 
+    public static InterestingComparisonsService interesting() { return instance.interestingComparisonsService; }
+
     private final FxmlStageService fxmlService;
     private final PropertiesService propertiesService;
     private final CredentialsService credentialsService;
     private final ContestService contestService;
     private final ComparisonService comparisonService;
     private final VerificationService verificationService;
+    private final InterestingComparisonsService interestingComparisonsService;
 
     private Services() {
         this.fxmlService = new FxmlStageService();
@@ -60,5 +59,6 @@ public class Services {
         );
         this.comparisonService = new ComparisonService();
         this.verificationService = new VerificationService();
+        this.interestingComparisonsService = new InterestingComparisonsService();
     }
 }

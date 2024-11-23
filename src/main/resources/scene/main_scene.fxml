@@ -11,6 +11,7 @@
             <MenuItem fx:id="loadRawDataMenuItem" text="Загрузить данные и слить с текущими"/>
             <MenuItem fx:id="saveReportMenuItem" text="Выгрузить полный протокол"/>
             <MenuItem fx:id="saveStandingsMenuItem" text="Выгрузить положение участников"/>
+            <MenuItem fx:id="saveInterestingMenuItem" text="Выгрузить 'интересные' пары"/>
         </Menu>
         <Menu text="Diff">
             <MenuItem fx:id="notSeenToIgnoredMenuItem" text="Непросмотренные - не списано"/>

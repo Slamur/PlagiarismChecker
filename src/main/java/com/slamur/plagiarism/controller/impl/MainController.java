@@ -46,6 +46,8 @@ public class MainController implements Controller {
 
     @FXML public MenuItem saveStandingsMenuItem;
 
+    @FXML public MenuItem saveInterestingMenuItem;
+
     @FXML public MenuItem notSeenToIgnoredMenuItem;
 
     @Override
@@ -95,6 +97,7 @@ public class MainController implements Controller {
         loadRawDataMenuItem.setOnAction(this::loadRawDataAction);
         saveReportMenuItem.setOnAction(this::saveReportAction);
         saveStandingsMenuItem.setOnAction(this::saveStandingsAction);
+        saveInterestingMenuItem.setOnAction(this::saveInterestingAction);
 
         notSeenToIgnoredMenuItem.setOnAction(this::notSeenToIgnoredAction);
     }
@@ -163,6 +166,19 @@ public class MainController implements Controller {
         } catch (Exception e) {
             AlertUtils.error(
                     "Ошибка при сохранении положения участников", e
+            );
+        }
+    }
+
+    private void saveInterestingAction(ActionEvent event) {
+        try {
+            Services.interesting().saveInteresting();
+            AlertUtils.information(
+                    "Интересные пары сохранены"
+            );
+        } catch (Exception e) {
+            AlertUtils.error(
+                    "Ошибка при сохранении интересных пар", e
             );
         }
     }
