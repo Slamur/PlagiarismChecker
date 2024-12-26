@@ -55,7 +55,7 @@ public class Services {
         this.propertiesService = new PropertiesService();
         this.credentialsService = new CredentialsService();
         this.contestService = new ContestServiceImpl(
-                new SamaraContestLoader(SamaraContest.OKRUG_2023)
+                new SamaraContestLoader(SamaraContest.OKRUG_2024)
         );
         this.comparisonService = new ComparisonService();
         this.verificationService = new VerificationService();

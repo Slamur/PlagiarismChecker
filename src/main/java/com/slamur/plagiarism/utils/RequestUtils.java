@@ -3,12 +3,22 @@ package com.slamur.plagiarism.utils;
 import java.io.DataOutputStream;
 import java.io.IOException;
 import java.net.HttpURLConnection;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URL;
 import java.util.Map;
 
 public class RequestUtils {
 
     public static final String GET = "GET", POST = "POST";
+
+    private static URL toURL(String url) throws IOException {
+        try {
+            return new URI(url).toURL();
+        } catch (URISyntaxException e) {
+            throw new IOException(e);
+        }
+    }
 
     public static String request(String type, 
                                  String url, 
@@ -17,7 +27,9 @@ public class RequestUtils {
                                  Map<String, String> cookies) throws IOException {
         if (!url.startsWith("/")) url = "/" + url;
         if (!url.startsWith(domain)) url = domain + url;
-        URL obj = new URL(url);
+
+        URL obj = toURL(url);
+
         HttpURLConnection connection = (HttpURLConnection) obj.openConnection();
 
         //add request header
