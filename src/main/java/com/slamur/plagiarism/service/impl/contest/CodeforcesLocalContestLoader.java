@@ -1,29 +1,22 @@
 package com.slamur.plagiarism.service.impl.contest;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.io.UnsupportedEncodingException;
 import java.time.LocalDateTime;
-import java.time.Month;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
 import com.slamur.plagiarism.model.parsing.contest.CodeforcesContest;
 import com.slamur.plagiarism.model.parsing.contest.Contest;
-import com.slamur.plagiarism.model.parsing.contest.EjudgeContest;
 import com.slamur.plagiarism.model.parsing.participant.Participant;
 import com.slamur.plagiarism.model.parsing.participant.ParticipantInfo;
 import com.slamur.plagiarism.model.parsing.participant.ParticipantSolutions;
-import com.slamur.plagiarism.model.parsing.solution.Language;
 import com.slamur.plagiarism.model.parsing.solution.Solution;
 import com.slamur.plagiarism.model.parsing.solution.SolutionProgram;
 import com.slamur.plagiarism.model.parsing.solution.Verdict;
@@ -127,7 +120,7 @@ public class CodeforcesLocalContestLoader implements ContestLoader {
             var info = solutionInfos.get(i);
 
             var solutions = participantToSolutions.computeIfAbsent(
-                    info.login, (login) -> new ArrayList<>()
+                    info.login, (_) -> new ArrayList<>()
             );
 
             solutions.add(i);
