@@ -1,7 +1,9 @@
 package com.slamur.plagiarism.service;
 
+import com.slamur.plagiarism.model.parsing.contest.DirectoryContest;
 import com.slamur.plagiarism.model.parsing.contest.SamaraContest;
 import com.slamur.plagiarism.service.impl.*;
+import com.slamur.plagiarism.service.impl.contest.DirectoryContestLoader;
 import com.slamur.plagiarism.service.impl.contest.SamaraContestLoader;
 
 public class Services {
@@ -55,7 +57,7 @@ public class Services {
         this.propertiesService = new PropertiesService();
         this.credentialsService = new CredentialsService();
         this.contestService = new ContestServiceImpl(
-                new SamaraContestLoader(SamaraContest.OKRUG_2024)
+                DirectoryContestLoader.forContest(DirectoryContest.DS_PART_2_EXAM_24_25)
         );
         this.comparisonService = new ComparisonService();
         this.verificationService = new VerificationService();

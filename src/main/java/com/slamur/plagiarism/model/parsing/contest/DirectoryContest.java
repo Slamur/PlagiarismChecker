@@ -7,10 +7,13 @@ import java.util.List;
 public class DirectoryContest extends Contest {
 
     private static final String NLOGN = "NlogN";
+    private static final String AUCA = "AUCA";
     private static final LocalDate NO_DATE = LocalDate.of(1, 1, 1);
     private static final LocalTime NO_TIME = LocalTime.of(1, 1, 1);
 
     public static final DirectoryContest NLOGN_QUAL_24 = new DirectoryContest(NLOGN, "sps_entrance");
+    public static final DirectoryContest DS_PART_2_EXAM_24_25 = new DirectoryContest(AUCA, "ds-part-2");
+    public static final DirectoryContest ALGO_PART_2_EXAM_24_25 = new DirectoryContest(AUCA, "algo-part-2");
 
     private final String directory;
 
