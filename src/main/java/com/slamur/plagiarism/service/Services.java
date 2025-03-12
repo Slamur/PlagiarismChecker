@@ -6,6 +6,7 @@ import com.slamur.plagiarism.model.parsing.contest.SamaraContest;
 import com.slamur.plagiarism.service.impl.*;
 import com.slamur.plagiarism.service.impl.contest.CodeforcesLocalContestLoader;
 import com.slamur.plagiarism.service.impl.contest.DirectoryContestLoader;
+import com.slamur.plagiarism.service.impl.contest.RecursiveDirectoryContestLoader;
 import com.slamur.plagiarism.service.impl.contest.SamaraContestLoader;
 
 public class Services {
@@ -59,8 +60,7 @@ public class Services {
         this.propertiesService = new PropertiesService();
         this.credentialsService = new CredentialsService();
         this.contestService = new ContestServiceImpl(
-//                DirectoryContestLoader.forContest(DirectoryContest.DS_PART_2_EXAM_24_25)
-                CodeforcesLocalContestLoader.forLocal(CodeforcesContest.MIREA_SCHOOL_QUAL_2022_JAN_30)
+                RecursiveDirectoryContestLoader.forContest(DirectoryContest.SAMSU_EXAM_24_25)
         );
         this.comparisonService = new ComparisonService();
         this.verificationService = new VerificationService();
