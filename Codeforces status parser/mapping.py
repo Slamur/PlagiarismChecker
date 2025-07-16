@@ -56,7 +56,7 @@ def transfer_submissions(user_submissions, root, submissions_dir):
             for submission_id, submission_info in problem_submissions.items():
                 date_str, language_name, verdict_name, time_str, memory_str = submission_info
                 
-                date_format_str = date_str.replace('/', '_')
+                date_format_str = date_str.replace('/', '_').replace('UTC+', 'UTC+0')
 
                 file_extension = [
                     extension
