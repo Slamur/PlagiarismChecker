@@ -15,9 +15,15 @@ public class DirectoryContest extends Contest {
 
     public static final DirectoryContest NLOGN_QUAL_24 = new DirectoryContest(NLOGN, "sps_entrance");
     public static final DirectoryContest DS_PART_2_EXAM_24_25 = new DirectoryContest(AUCA, "ds-part-2");
-    public static final DirectoryContest ALGO_PART_2_EXAM_24_25 = new DirectoryContest(AUCA, "algo-part-2");
+    public static final DirectoryContest ADVANCED_ALGO_PART_2_EXAM_24_25 = new DirectoryContest(AUCA, "algo-part-2");
     public static final DirectoryContest SAMSU_EXAM_24_25 = new DirectoryContest(SAMSU, "samsu-2024-2025",
             IntStream.range(0, 26).mapToObj(
+                index -> String.valueOf((char)(index + 'A'))
+            ).toList()
+    );
+
+    public static final DirectoryContest ALGO_PART_1_EXAM_24_25 = new DirectoryContest(AUCA, "auca-algos-25-part-1",
+            IntStream.range(0, 5).mapToObj(
                 index -> String.valueOf((char)(index + 'A'))
             ).toList()
     );

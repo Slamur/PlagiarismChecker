@@ -60,7 +60,7 @@ public class Services {
         this.propertiesService = new PropertiesService();
         this.credentialsService = new CredentialsService();
         this.contestService = new ContestServiceImpl(
-                RecursiveDirectoryContestLoader.forContest(DirectoryContest.SAMSU_EXAM_24_25)
+                RecursiveDirectoryContestLoader.forContest(DirectoryContest.ALGO_PART_1_EXAM_24_25)
         );
         this.comparisonService = new ComparisonService();
         this.verificationService = new VerificationService();
