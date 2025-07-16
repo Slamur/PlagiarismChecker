@@ -5,6 +5,7 @@ import com.slamur.plagiarism.model.parsing.contest.DirectoryContest;
 import com.slamur.plagiarism.model.parsing.participant.Participant;
 import com.slamur.plagiarism.model.parsing.participant.ParticipantInfo;
 import com.slamur.plagiarism.model.parsing.participant.ParticipantSolutions;
+import com.slamur.plagiarism.model.parsing.solution.Language;
 import com.slamur.plagiarism.model.parsing.solution.Solution;
 import com.slamur.plagiarism.model.parsing.solution.SolutionProgram;
 import com.slamur.plagiarism.model.parsing.solution.Verdict;
@@ -13,6 +14,7 @@ import com.slamur.plagiarism.utils.IOUtils;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -37,11 +39,13 @@ public class RecursiveDirectoryContestLoader implements ContestLoader {
         );
     }
 
-    private record SolutionInfo(String problemId, String id, String languageAlias, File file) { }
+    private record SolutionInfo(String problemId, String id, LocalDateTime dateTime, Verdict verdict, Language language, File file) { }
 
     private static Map<ParticipantInfo, List<SolutionInfo>> readParticipantsSolutionsInfo(
             File directory
     ) {
+        var dateFormatter = DateTimeFormatter.ofPattern("MMM_dd_uuuu HH:mm'UTC'X");
+
         return IOUtils.getFiles(directory).stream().collect(
                 Collectors.toMap(
                         participantDirectory -> new ParticipantInfo(
@@ -55,9 +59,21 @@ public class RecursiveDirectoryContestLoader implements ContestLoader {
                                     String name = solutionFile.getName();
 
                                     int dotIndex = name.indexOf(".");
-                                    String id = name.substring(0, dotIndex);
-                                    String languageAlias = name.substring(dotIndex + 1);
-                                    return new SolutionInfo(problemId, id, languageAlias, solutionFile);
+                                    String metaInfo = name.substring(0, dotIndex);
+                                    String[] metaParts = metaInfo.split("-");
+
+                                    String id = metaParts[0];
+
+                                    String datePart = metaParts[1];
+                                    var date = LocalDateTime.parse(datePart, dateFormatter);
+
+                                    String verdictPart = metaParts[2];
+                                    Verdict verdict = Verdict.fromText(verdictPart);
+
+                                    String languageExtension = name.substring(dotIndex + 1);
+                                    Language language = Language.fromExtension(languageExtension);
+
+                                    return new SolutionInfo(problemId, id, date, verdict, language, solutionFile);
                                });
                         }).toList()
                 )
@@ -67,7 +83,7 @@ public class RecursiveDirectoryContestLoader implements ContestLoader {
     private final DirectoryContest contest;
     private final Map<Participant, List<SolutionInfo>> participantSolutions;
 
-    public RecursiveDirectoryContestLoader(DirectoryContest contest, Map<ParticipantInfo, List<SolutionInfo>> participantsSolutionsInfo) {
+    private RecursiveDirectoryContestLoader(DirectoryContest contest, Map<ParticipantInfo, List<SolutionInfo>> participantsSolutionsInfo) {
         this.contest = contest;
 
         this.participantSolutions = participantsSolutionsInfo.entrySet().stream().collect(
@@ -104,20 +120,20 @@ public class RecursiveDirectoryContestLoader implements ContestLoader {
                 var solutionProgram = IOUtils.loadFromFile(solutionInfo.file(), in -> {
                     var lines = in.lines().toList();
                     return SolutionProgram.create(
-                            solutionInfo.languageAlias,
+                            solutionInfo.language().toString(),
                             String.join("\n", lines),
-                            Verdict.AC
+                            solutionInfo.verdict()
                     );
                 });
 
                 var solution = new Solution(
                         solutionInfo.id(),
                         participant,
-                        solutionInfo.problemId,
+                        solutionInfo.problemId(),
                         solutionProgram,
-                        Verdict.AC,
+                        solutionInfo.verdict(),
                         1,
-                        LocalDateTime.now(),
+                        solutionInfo.dateTime(),
                         solutionInfo.id()
                 );
 
