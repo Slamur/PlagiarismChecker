@@ -169,7 +169,7 @@ public class NlogNLocalContestLoader implements ContestLoader {
                     solutionInfo.submitId,
                     participant,
                     solutionInfo.problemName,
-                    SolutionProgram.create(solutionInfo.language, solutionInfo.code, solutionInfo.verdict),
+                    SolutionProgram.create(solutionInfo.language.toString(), solutionInfo.code, solutionInfo.verdict),
                     solutionInfo.verdict,
                     solutionInfo.score,
                     solutionInfo.dateTime,
