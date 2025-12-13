@@ -6,7 +6,6 @@ import java.util.List;
 
 import com.slamur.plagiarism.model.parsing.participant.Participant;
 import com.slamur.plagiarism.model.parsing.solution.Solution;
-import com.slamur.plagiarism.service.impl.contest.ContestLoader;
 import com.slamur.plagiarism.service.impl.contest.SamaraContestLoader;
 
 public class SamaraContest extends Contest {
@@ -99,6 +98,14 @@ public class SamaraContest extends Contest {
             LocalTime.of(10, 0),
             LocalTime.of(14, 7),
             problemsRange('A', 'E')
+    );
+
+    public static final SamaraContest OKRUG_2025 = new SamaraContest(
+            CITY,  613,
+            LocalDate.of(2025, 11, 29),
+            LocalTime.of(10, 0),
+            LocalTime.of(14, 15),
+            problemsRange('A', 'D')
     );
 
     public SamaraContest(String type,
