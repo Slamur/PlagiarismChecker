@@ -60,7 +60,10 @@ public class Services {
         this.propertiesService = new PropertiesService();
         this.credentialsService = new CredentialsService();
         this.contestService = new ContestServiceImpl(
-                new SamaraContestLoader(SamaraContest.OKRUG_2025)
+                RecursiveDirectoryContestLoader.forContest(new DirectoryContest(
+                        SamaraContest.OKRUG_2025,
+                        "okrug-25-26"
+                ))
         );
         this.comparisonService = new ComparisonService();
         this.verificationService = new VerificationService();

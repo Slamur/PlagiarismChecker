@@ -104,9 +104,29 @@ public class SamaraContest extends Contest {
             CITY,  613,
             LocalDate.of(2025, 11, 29),
             LocalTime.of(10, 0),
-            LocalTime.of(14, 15),
+            LocalDate.of(2025, 12, 31),
+            LocalTime.of(23, 59),
             problemsRange('A', 'D')
     );
+
+    public SamaraContest(String type,
+                         int id,
+                         LocalDate startDate,
+                         LocalTime startTime,
+                         LocalDate endDate,
+                         LocalTime endTime,
+                         List<String> problems) {
+        super(type,
+                id,
+                startDate,
+                startTime,
+                endDate,
+                endTime,
+                problems,
+                false,
+                1
+        );
+    }
 
     public SamaraContest(String type,
                          int id,

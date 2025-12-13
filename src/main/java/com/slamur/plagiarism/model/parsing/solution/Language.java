@@ -10,10 +10,10 @@ import static java.util.Collections.emptyMap;
 public enum Language {
 
     PASCAL("pas", List.of("fpc"), Map.of("\\{", "\\}"), "//"),
-    CPP("cpp", List.of("g++", "gpp17"), Map.of("/\\*", "\\*/"), "//"),
-    JAVA("java", List.of("javac", "javaw17"), Map.of("/\\*", "\\*/"), "//"),
+    CPP("cpp", List.of("g++", "gpp17", "gpp"), Map.of("/\\*", "\\*/"), "//"),
+    JAVA("java", List.of("javac", "javaw17", "java25", "javaw25"), Map.of("/\\*", "\\*/"), "//"),
     CSHARP("cs", List.of("charp"), Map.of("/\\*", "\\*/"), "//"),
-    PYTHON("py", List.of("python3", "py39", "py37"), Map.of("'''", "'''"), "#"),
+    PYTHON("py", List.of("python3", "py39", "py37", "py39", "py313"), Map.of("'''", "'''"), "#"),
     TEXT("txt", emptyList(), emptyMap(), "");
 
     private final String fileExtension;

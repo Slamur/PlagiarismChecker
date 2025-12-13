@@ -39,6 +39,20 @@ public class DirectoryContest extends Contest {
         this.directory = directory;
     }
 
+    public DirectoryContest(Contest contest, String directory) {
+        super(
+                contest.getType(),
+                contest.getId(),
+                contest.getStartDateTime(),
+                contest.getEndDateTime(),
+                contest.getProblems(),
+                contest.compareOnlyBestSolutions(),
+                contest.getMinimalProblemsToCompare()
+        );
+
+        this.directory = directory;
+    }
+
     public String getDirectory() {
         return directory;
     }

@@ -43,8 +43,29 @@ public class Contest {
                    int minimalProblemsToCompare) {
         this(type,
                 id,
-                LocalDateTime.of(date, startTime),
-                LocalDateTime.of(date, endTime),
+                date,
+                startTime,
+                date,
+                endTime,
+                problems,
+                compareOnlyBestSolutions,
+                minimalProblemsToCompare
+        );
+    }
+
+    public Contest(String type,
+                   int id,
+                   LocalDate startDate,
+                   LocalTime startTime,
+                   LocalDate endDate,
+                   LocalTime endTime,
+                   List<String> problems,
+                   boolean compareOnlyBestSolutions,
+                   int minimalProblemsToCompare) {
+        this(type,
+                id,
+                LocalDateTime.of(startDate, startTime),
+                LocalDateTime.of(endDate, endTime),
                 problems,
                 compareOnlyBestSolutions,
                 minimalProblemsToCompare

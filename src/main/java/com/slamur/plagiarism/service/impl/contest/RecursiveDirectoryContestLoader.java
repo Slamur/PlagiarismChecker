@@ -44,7 +44,7 @@ public class RecursiveDirectoryContestLoader implements ContestLoader {
     private static Map<ParticipantInfo, List<SolutionInfo>> readParticipantsSolutionsInfo(
             File directory
     ) {
-        var dateFormatter = DateTimeFormatter.ofPattern("MMM_dd_uuuu HH:mm'UTC'X");
+        var dateFormatter = DateTimeFormatter.ofPattern("uuuu-MM-dd HH:mm:ss");
 
         return IOUtils.getFiles(directory).stream().collect(
                 Collectors.toMap(
@@ -60,18 +60,19 @@ public class RecursiveDirectoryContestLoader implements ContestLoader {
 
                                     int dotIndex = name.indexOf(".");
                                     String metaInfo = name.substring(0, dotIndex);
-                                    String[] metaParts = metaInfo.split("-");
+                                    String[] metaParts = metaInfo.split("-", 2);
 
                                     String id = metaParts[0];
 
                                     String datePart = metaParts[1];
                                     var date = LocalDateTime.parse(datePart, dateFormatter);
 
-                                    String verdictPart = metaParts[2];
-                                    Verdict verdict = Verdict.fromText(verdictPart);
+//                                    String verdictPart = metaParts[2];
+//                                    Verdict verdict = Verdict.fromText(verdictPart);
+                                   Verdict verdict = Verdict.AC;
 
                                     String languageExtension = name.substring(dotIndex + 1);
-                                    Language language = Language.fromExtension(languageExtension);
+                                    Language language = Language.fromAliasOrExtension(languageExtension);
 
                                     return new SolutionInfo(problemId, id, date, verdict, language, solutionFile);
                                });
