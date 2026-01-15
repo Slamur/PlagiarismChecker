@@ -1,5 +1,8 @@
 package com.slamur.plagiarism.model.parsing.contest;
 
+import com.slamur.plagiarism.model.parsing.participant.Participant;
+import com.slamur.plagiarism.model.parsing.solution.Solution;
+
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.List;
@@ -28,6 +31,7 @@ public class DirectoryContest extends Contest {
             ).toList()
     );
 
+    private final Contest contest;
     private final String directory;
 
     public DirectoryContest(String type, String directory) {
@@ -37,6 +41,7 @@ public class DirectoryContest extends Contest {
     public DirectoryContest(String type, String directory, List<String> problems) {
         super(type, -1, NO_DATE, NO_TIME, NO_TIME, problems, false, 1);
         this.directory = directory;
+        this.contest = null;
     }
 
     public DirectoryContest(Contest contest, String directory) {
@@ -50,10 +55,21 @@ public class DirectoryContest extends Contest {
                 contest.getMinimalProblemsToCompare()
         );
 
+        this.contest = contest;
         this.directory = directory;
     }
 
     public String getDirectory() {
         return directory;
+    }
+
+    @Override
+    public String toText(Solution solution) {
+        return (contest != null) ? contest.toText(solution) : super.toText(solution);
+    }
+
+    @Override
+    public String toText(Participant participant) {
+        return (contest != null) ? contest.toText(participant) : super.toText(participant);
     }
 }
